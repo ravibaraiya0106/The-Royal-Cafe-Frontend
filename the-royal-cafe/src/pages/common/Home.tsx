@@ -2,12 +2,14 @@ import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
 import Separator from "@/components/common/Seperator";
+import CafeCarousel from "@/components/home/CafeCarousel";
 
 const Home = () => {
   return (
     <>
       <Navbar />
-
+      <CafeCarousel />
+      <Separator />
       {/* ================= HERO ================= */}
       <section>
         <div className="max-w-screen-xl mx-auto px-4 py-20">
