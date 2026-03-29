@@ -223,7 +223,7 @@ const Navbar = () => {
         </div>
 
         {/* Mobile menu */}
-        {menuOpen && (
+        {/* {menuOpen && (
           <div className="md:hidden w-full" aria-label="Mobile navigation">
             <ul className="mt-4 p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-2">
               {navItems.map((item, idx) => (
@@ -242,7 +242,7 @@ const Navbar = () => {
               ))}
             </ul>
           </div>
-        )}
+        )} */}
       </div>
     </nav>
   );
