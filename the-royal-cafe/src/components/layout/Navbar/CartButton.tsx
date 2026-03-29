@@ -19,4 +19,3 @@ const CartButton = ({ cartCount }: { cartCount: number }) => {
 };
 
 export default CartButton;
-

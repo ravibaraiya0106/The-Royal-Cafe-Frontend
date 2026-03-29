@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { NAV_ITEMS } from "@/constants/navigation";
+import { NAV_ITEMS } from "@/constants/Navigation.ts";
 import type { NavItemType } from "@/types/common";
 import logo from "@/assets/images/logo.png";
 import { Link } from "react-router-dom";
@@ -9,7 +9,7 @@ import DesktopNav from "./DesktopNav.tsx";
 import MobileNav from "./MobileNav.tsx";
 import ProfileMenu from "./ProfileMenu.tsx";
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { user, PROFILE_MENU_ITEMS } from "@/constants/profileMenu.ts";
+import { user, PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);

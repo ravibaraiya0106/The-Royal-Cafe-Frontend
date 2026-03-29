@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
+import Separator from "@/components/common/Seperator";
 
 const Home = () => {
   return (
@@ -8,7 +9,7 @@ const Home = () => {
       <Navbar />
 
       {/* ================= HERO ================= */}
-      <section className="mt-16 bg-gray-50">
+      <section>
         <div className="max-w-screen-xl mx-auto px-4 py-20">
           <div className="grid md:grid-cols-2 items-center gap-10">
             {/* Text */}
@@ -52,6 +53,8 @@ const Home = () => {
           </div>
         </div>
       </section>
+
+      <Separator />
 
       <Footer />
     </>

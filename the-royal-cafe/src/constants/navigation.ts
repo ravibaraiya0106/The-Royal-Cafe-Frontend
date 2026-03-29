@@ -9,6 +9,7 @@ export const ROUTES = {
   BLOG: "/blog",
   CONTACT: "/contact",
   FOOD_ITEM: "/fooditem",
+  CART: "/cart",
 };
 
 export const NAV_ITEMS: NavItemType[] = [

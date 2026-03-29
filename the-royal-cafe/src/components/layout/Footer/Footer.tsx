@@ -1,5 +1,5 @@
 import logo from "@/assets/images/logo1.png";
-import { QUICK_LINKS } from "@/constants/navigation";
+import { QUICK_LINKS } from "@/constants/Navigation";
 import FooterLink from "./FooterLink";
 import FooterSection from "./FooterSection";
 import FooterSocialIcons from "./FooterSocialIcons";
@@ -7,7 +7,7 @@ import FooterContactItems from "./FooterContactItems";
 
 const Footer = () => {
   return (
-    <footer className="mt-10 bg-white border-t border-gray-200">
+    <footer className="abg-white border-t border-gray-200">
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
         <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 sm:gap-10 text-center sm:text-left">
           {/* Logo + Description */}

@@ -1,4 +1,4 @@
-import { SOCIAL_LINKS } from "@/constants/footer";
+import { SOCIAL_LINKS } from "@/constants/Footer";
 import SocialIcon from "./SocialIcon";
 
 const FooterSocialIcons = () => {
@@ -17,4 +17,3 @@ const FooterSocialIcons = () => {
 };
 
 export default FooterSocialIcons;
-

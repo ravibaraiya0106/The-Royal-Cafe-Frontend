@@ -1,15 +1,15 @@
 import { Link } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
-
+import Separator from "@/components/common/Seperator";
 const About = () => {
   return (
     <>
       <Navbar />
 
-      <div className="mt-16">
+      <div>
         {/* ================= ABOUT SECTION ================= */}
-        <section className="py-16">
+        <section className="py-10">
           <div className="max-w-screen-xl mx-auto px-4">
             <div className="grid md:grid-cols-2 gap-10 items-center">
               {/* Image */}
@@ -75,12 +75,12 @@ const About = () => {
             </div>
           </div>
         </section>
-
+        <Separator />
         {/* ================= STORY SECTION ================= */}
-        <section className="bg-gray-50 py-16">
+        <section className="py-16">
           <div className="max-w-screen-xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-bold text-gray-900">
-              When your stomach is full, everything feels better ☕
+              When your stomach is full, everything feels better
             </h2>
 
             <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
@@ -97,6 +97,7 @@ const About = () => {
             </Link>
           </div>
         </section>
+        <Separator />
       </div>
 
       <Footer />

@@ -1,4 +1,4 @@
-import { CONTACT_ITEMS } from "@/constants/footer";
+import { CONTACT_ITEMS } from "@/constants/Footer";
 
 const FooterContactItems = () => {
   return (
@@ -17,4 +17,3 @@ const FooterContactItems = () => {
 };
 
 export default FooterContactItems;
-

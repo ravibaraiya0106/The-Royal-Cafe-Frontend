@@ -8,7 +8,9 @@ const Blog = () => {
       <Navbar />
 
       <div className="mt-16">
-        <h1>Contact Page</h1>
+        <section className="py-16">
+          <h1>Blog Page</h1>
+        </section>
       </div>
 
       <Footer />
