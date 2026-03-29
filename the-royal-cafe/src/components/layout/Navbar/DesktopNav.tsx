@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import type { NavItemType } from "@/types/common";
 
 const DesktopNav = ({
@@ -9,19 +9,24 @@ const DesktopNav = ({
   onNavigate: () => void;
 }) => {
   return (
-    <div className="items-center justify-between hidden w-full md:flex md:w-auto md:order-1">
-      <ul className="font-medium flex flex-col p-0 border-0 rounded-xl bg-transparent md:flex-row md:space-x-8 rtl:space-x-reverse">
+    <div className="hidden md:flex md:order-1">
+      <ul className="flex items-center space-x-6 font-medium">
         {navItems.map((item, idx) => (
           <li key={`${item.label}-${idx}`}>
-            <Link
+            <NavLink
               to={item.to}
-              className={`block py-2 px-3 rounded-lg md:p-0 text-gray-700 hover:text-brand ${
-                item.to === "/" ? "text-brand" : ""
-              }`}
               onClick={onNavigate}
+              className={({ isActive }) =>
+                `px-4 py-2 rounded-lg transition-all duration-300
+                 ${
+                   isActive
+                     ? "bg-brand text-white"
+                     : "text-gray-700 hover:bg-brand hover:text-white"
+                 }`
+              }
             >
               {item.label}
-            </Link>
+            </NavLink>
           </li>
         ))}
       </ul>
@@ -30,4 +35,3 @@ const DesktopNav = ({
 };
 
 export default DesktopNav;
-

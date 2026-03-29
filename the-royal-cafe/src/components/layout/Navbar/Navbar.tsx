@@ -9,6 +9,7 @@ import DesktopNav from "./DesktopNav.tsx";
 import MobileNav from "./MobileNav.tsx";
 import ProfileMenu from "./ProfileMenu.tsx";
 import { useClickOutside } from "@/hooks/useClickOutside";
+import { user, PROFILE_MENU_ITEMS } from "@/constants/profileMenu.ts";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -95,6 +96,8 @@ const Navbar = () => {
             profileMenuId={profileMenuId}
             profileButtonRef={profileButtonRef}
             profileMenuRef={profileMenuRef}
+            user={user}
+            items={PROFILE_MENU_ITEMS}
           />
 
           {/* Mobile menu toggle */}
