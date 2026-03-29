@@ -1,8 +1,7 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
-
-const BRAND = "#6b0f0f";
+import { FiShoppingCart } from "react-icons/fi";
 
 type NavItem = {
   label: string;
@@ -13,6 +12,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileMenuId = useId();
+  const cartCount = 3;
 
   const profileButtonRef = useRef<HTMLButtonElement | null>(null);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
@@ -78,13 +78,23 @@ const Navbar = () => {
             className="h-11 object-contain"
             alt="The Royal Cafe Logo"
           />
-          {/* <span className="self-center text-xl font-semibold whitespace-nowrap text-[var(--brand, #6b0f0f)]">
-            The Royal Cafe
-          </span> */}
         </Link>
 
         {/* Right side */}
         <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+          <Link
+            to="/cart"
+            className="relative mr-3 p-2 rounded-xl hover:bg-gray-100 transition"
+          >
+            <FiShoppingCart className="w-6 h-6 text-gray-700 hover:text-brand" />
+
+            {/* Badge */}
+            {cartCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-brand text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-full">
+                {cartCount}
+              </span>
+            )}
+          </Link>
           {/* Profile button + dropdown */}
           <div className="relative">
             <button
@@ -125,7 +135,7 @@ const Navbar = () => {
                     <Link
                       to="/dashboard"
                       role="menuitem"
-                      className="block w-full p-2 rounded-lg hover:bg-gray-100 hover:text-[#6b0f0f]"
+                      className="block w-full p-2 rounded-lg hover:bg-brand hover:text-white"
                       onClick={() => setProfileOpen(false)}
                     >
                       Dashboard
@@ -135,7 +145,7 @@ const Navbar = () => {
                     <Link
                       to="/settings"
                       role="menuitem"
-                      className="block w-full p-2 rounded-lg hover:bg-gray-100 hover:text-[#6b0f0f]"
+                      className="block w-full p-2 rounded-lg hover:bg-brand hover:text-white"
                       onClick={() => setProfileOpen(false)}
                     >
                       Settings
@@ -145,7 +155,7 @@ const Navbar = () => {
                     <Link
                       to="/earnings"
                       role="menuitem"
-                      className="block w-full p-2 rounded-lg hover:bg-gray-100 hover:text-[#6b0f0f]"
+                      className="block w-full p-2 rounded-lg hover:bg-brand hover:text-white"
                       onClick={() => setProfileOpen(false)}
                     >
                       Earnings
@@ -155,7 +165,7 @@ const Navbar = () => {
                     <button
                       type="button"
                       role="menuitem"
-                      className="block w-full text-left p-2 rounded-lg hover:bg-gray-100 hover:text-[#6b0f0f]"
+                      className="block w-full text-left p-2 rounded-lg hover:bg-brand hover:text-white "
                       onClick={() => {
                         // TODO: wire to your real auth/logout handler.
                         setProfileOpen(false);
@@ -173,7 +183,7 @@ const Navbar = () => {
           <button
             data-collapse-toggle="navbar-user"
             type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-700 rounded-xl md:hidden hover:bg-gray-100 hover:text-[#6b0f0f] focus:outline-none focus:ring-2 focus:ring-gray-200"
+            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-700 rounded-xl md:hidden hover:bg-gray-100 hover:text-brand focus:outline-none focus:ring-2 focus:ring-gray-200"
             aria-controls="navbar-user"
             aria-expanded={menuOpen}
             onClick={() => setMenuOpen((v) => !v)}
@@ -189,7 +199,7 @@ const Navbar = () => {
               viewBox="0 0 24 24"
             >
               <path
-                stroke={BRAND}
+                className="stroke-brand"
                 strokeLinecap="round"
                 strokeWidth="2"
                 d="M5 7h14M5 12h14M5 17h14"
@@ -208,8 +218,9 @@ const Navbar = () => {
               <li key={`${item.label}-${idx}`}>
                 <Link
                   to={item.to}
-                  className="block py-2 px-3 rounded-lg hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:p-0 text-gray-700"
-                  style={item.to === "/" ? { color: BRAND } : undefined}
+                  className={`block py-2 px-3 rounded-lg md:p-0 text-gray-700 hover:text-brand ${
+                    item.to === "/" ? "text-brand" : ""
+                  }`}
                   onClick={() => {
                     setMenuOpen(false);
                     setProfileOpen(false);
@@ -223,14 +234,14 @@ const Navbar = () => {
         </div>
 
         {/* Mobile menu */}
-        {/* {menuOpen && (
+        {menuOpen && (
           <div className="md:hidden w-full" aria-label="Mobile navigation">
-            <ul className="mt-4 p-4 border border-gray-200 rounded-xl bg-gray-50 space-y-2">
+            <ul className="mt-4 p-4 border border-gray-200 rounded-xl space-y-2">
               {navItems.map((item, idx) => (
                 <li key={`${item.label}-${idx}`}>
                   <Link
                     to={item.to}
-                    className="block py-2 px-3 rounded-lg text-gray-800 hover:bg-gray-100"
+                    className="block py-2 px-3 rounded-lg text-gray-800 hover:bg-brand hover:text-white"
                     onClick={() => {
                       setMenuOpen(false);
                       setProfileOpen(false);
@@ -242,7 +253,7 @@ const Navbar = () => {
               ))}
             </ul>
           </div>
-        )} */}
+        )}
       </div>
     </nav>
   );
