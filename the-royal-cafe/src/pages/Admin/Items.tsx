@@ -1,11 +1,11 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 
-const Blogs = () => {
+const Items = () => {
   return (
     <AdminLayout>
-      <h1 className="text-2xl font-bold text-brand">Blogs</h1>
+      <h1 className="text-2xl font-bold text-brand">Items</h1>
     </AdminLayout>
   );
 };
 
-export default Blogs;
+export default Items;

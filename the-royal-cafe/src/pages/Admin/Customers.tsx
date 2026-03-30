@@ -1,6 +1,6 @@
 import AdminLayout from "@/Layouts/AdminLayout";
 
-const Dashboard = () => {
+const Customers = () => {
   return (
     <AdminLayout>
       <h1 className="text-2xl font-bold text-brand">Customers</h1>
@@ -8,4 +8,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default Customers;

@@ -1,14 +1,42 @@
 import { Route } from "react-router-dom";
 
+import { ROUTES as ADMIN_ROUTES } from "@/constants/Sidebar";
+
 import Dashboard from "@/pages/Admin/Dashboard";
-// import Items from "@/pages/admin/Items";
-// import Orders from "@/pages/admin/Orders";
+import Items from "@/pages/Admin/Items";
+import Categories from "@/pages/Admin/Categories";
+import Orders from "@/pages/Admin/Orders";
+import Customers from "@/pages/Admin/Customers";
+import Blogs from "@/pages/Admin/Blogs";
+import Contact from "@/pages/Admin/Contact";
+import Coupons from "@/pages/Admin/Coupons";
+import DeliveryPerson from "@/pages/Admin/DeliveryPerson";
+import Reviews from "@/pages/Admin/Reviews";
 
 export const AdminRoutes = (
   <>
-    {/* <Sidebar /> */}
-    <Route path="/admin/dashboard" element={<Dashboard />} />
-    {/* <Route path="/admin/items" element={<Items />} /> */}
-    {/* <Route path="/admin/orders" element={<Orders />} /> */}
+    {/* Admin area routes (mounted inside AppRoutes' <Routes />) */}
+    <Route
+      path={ADMIN_ROUTES.ADMIN_DASHBOARD}
+      element={<Dashboard />}
+    />
+    <Route path={ADMIN_ROUTES.ADMIN_ITEMS} element={<Items />} />
+    <Route
+      path={ADMIN_ROUTES.ADMIN_CATEGORIES}
+      element={<Categories />}
+    />
+    <Route path={ADMIN_ROUTES.ADMIN_ORDERS} element={<Orders />} />
+    <Route
+      path={ADMIN_ROUTES.ADMIN_CUSTOMERS}
+      element={<Customers />}
+    />
+    <Route
+      path={ADMIN_ROUTES.ADMIN_DELIVERY}
+      element={<DeliveryPerson />}
+    />
+    <Route path={ADMIN_ROUTES.ADMIN_BLOGS} element={<Blogs />} />
+    <Route path={ADMIN_ROUTES.ADMIN_CONTACT} element={<Contact />} />
+    <Route path={ADMIN_ROUTES.ADMIN_COUPONS} element={<Coupons />} />
+    <Route path={ADMIN_ROUTES.ADMIN_REVIEWS} element={<Reviews />} />
   </>
 );
