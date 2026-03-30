@@ -20,8 +20,8 @@ const DesktopNav = ({
                 `px-4 py-2 rounded-lg transition-all duration-300
                  ${
                    isActive
-                     ? "bg-brand text-white"
-                     : "text-gray-700 hover:bg-brand hover:text-white"
+                     ? "bg-brand text-white shadow-sm"
+                     : "text-gray-700 hover:bg-gray-100 hover:text-brand"
                  }`
               }
             >

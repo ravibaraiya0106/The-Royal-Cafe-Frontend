@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import type { NavItemType } from "@/types/common";
 import type { RefObject } from "react";
 
@@ -33,13 +33,19 @@ const MobileNav = ({
           <ul className="space-y-2">
             {navItems.map((item, idx) => (
               <li key={`${item.label}-${idx}`}>
-                <Link
+                <NavLink
                   to={item.to}
-                  className="block py-2 px-3 rounded-lg text-gray-800 hover:bg-brand hover:text-white"
+                  className={({ isActive }) =>
+                    `block py-2 px-3 rounded-lg transition-all duration-300 ${
+                      isActive
+                        ? "bg-brand text-white shadow-sm"
+                        : "text-gray-700 hover:bg-gray-100 hover:text-brand"
+                    }`
+                  }
                   onClick={onNavigate}
                 >
                   {item.label}
-                </Link>
+                </NavLink>
               </li>
             ))}
           </ul>
