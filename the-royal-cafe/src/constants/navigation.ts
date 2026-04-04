@@ -10,6 +10,10 @@ export const ROUTES = {
   CONTACT: "/contact",
   FOOD_ITEM: "/fooditem",
   CART: "/cart",
+  LOGIN: "/login",
+  REGISTER: "/register",
+  FORGOT_PASSWORD: "/forgot-password",
+  RESET_PASSWORD: "/reset-password",
 };
 
 export const NAV_ITEMS: NavItemType[] = [

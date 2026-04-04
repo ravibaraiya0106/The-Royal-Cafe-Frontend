@@ -14,6 +14,7 @@ import {
 
 export const ROUTES = {
   // Admin Routes
+  ADMIN_LOGIN: "/admin/login",
   ADMIN_DASHBOARD: "/admin/dashboard",
   ADMIN_ITEMS: "/admin/items",
   ADMIN_CATEGORIES: "/admin/categories",

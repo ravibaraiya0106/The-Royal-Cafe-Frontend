@@ -6,13 +6,17 @@ import Contact from "@/pages/common/Contact";
 import Blog from "@/pages/blog/Blog";
 import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
-
+import Login from "@/components/auth/Login";
+import Register from "@/components/auth/Register";
 import { ROUTES } from "@/constants/Navigation";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
+        {/*  Auth routes */}
+        <Route path={ROUTES.LOGIN} element={<Login />} />
+        <Route path={ROUTES.REGISTER} element={<Register />} />
         {/*  Pages */}
         <Route path={ROUTES.HOME} element={<Home />} />
         <Route path={ROUTES.ABOUT} element={<About />} />

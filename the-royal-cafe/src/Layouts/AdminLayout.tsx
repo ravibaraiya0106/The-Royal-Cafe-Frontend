@@ -1,4 +1,4 @@
-import Sidebar from "@/components/Admin/SideBar/Sidebar";
+import Sidebar from "../components/Admin/SideBar/Sidebar";
 
 import { useState } from "react";
 
@@ -7,14 +7,14 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <>
-      <div className="flex mt-16">
+      <div className="flex">
         <Sidebar
           collapsed={collapsed}
           onToggle={() => setCollapsed((v) => !v)}
         />
 
         <main
-          className={`w-full p-6 min-h-screen transition-all duration-300 ${
+          className={`w-full min-h-screen transition-all duration-300 ${
             collapsed ? "ml-20" : "ml-64"
           }`}
         >
