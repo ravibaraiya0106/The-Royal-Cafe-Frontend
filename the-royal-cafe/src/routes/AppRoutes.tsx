@@ -24,6 +24,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.CONTACT} element={<Contact />} />
         <Route path={ROUTES.BLOG} element={<Blog />} />
         <Route path={ROUTES.FOOD_ITEM} element={<Items />} />
+        
         {AdminRoutes}
         {/*  Fallback */}
         <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

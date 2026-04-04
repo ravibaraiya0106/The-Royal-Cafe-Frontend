@@ -1,8 +1,13 @@
 import { FiChevronsLeft, FiChevronsRight, FiLogOut } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+
 import SidebarItem from "./SidebarItem";
 import { SIDEBAR_ITEMS } from "../../../constants/Sidebar";
 import logo from "../../../assets/images/logo.png";
 import logo1 from "../../../assets/images/logo1.png";
+
+import { logout } from "../../../utils/storage"; // ✅ import
+import { toastSuccess } from "../../../utils/toast"; // ✅ import
 
 const Sidebar = ({
   collapsed,
@@ -11,6 +16,18 @@ const Sidebar = ({
   collapsed: boolean;
   onToggle: () => void;
 }) => {
+  const navigate = useNavigate();
+
+  // ✅ LOGOUT FUNCTION
+  const handleLogout = () => {
+    logout(); // clear localStorage
+    toastSuccess("Logged out successfully");
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 10000);
+  };
+
   return (
     <aside
       className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-40 transition-all duration-300 ${
@@ -22,17 +39,16 @@ const Sidebar = ({
         <div className="flex items-center justify-center overflow-hidden">
           <img
             src={collapsed ? logo1 : logo}
-            alt={collapsed ? "Logo" : "Logo"}
-            className={`${collapsed ? "h-16" : "h-16"} object-contain`}
+            alt="Logo"
+            className="h-16 object-contain"
           />
         </div>
 
-        {/* Collapse/expand */}
+        {/* Toggle */}
         <button
           type="button"
           onClick={onToggle}
           className="hidden lg:flex items-center justify-center absolute -right-3 top-12 w-7 h-7 bg-white border border-gray-300 rounded-full shadow-md hover:bg-gray-100 transition"
-          aria-label={collapsed ? "Open sidebar" : "Close sidebar"}
         >
           {collapsed ? (
             <FiChevronsRight size={14} className="text-brand" />
@@ -59,16 +75,13 @@ const Sidebar = ({
       <div className="absolute bottom-4 w-full px-4">
         <button
           type="button"
-          className={`flex items-center w-full py-2 rounded-xl text-gray-700 hover:bg-brand-50 hover:text-brand-500 transition ${
+          onClick={handleLogout} // ✅ attach here
+          className={`flex items-center w-full py-2 rounded-xl text-gray-700 hover:bg-red-50 hover:text-red-500 transition ${
             collapsed ? "justify-center px-2" : "gap-3 px-4"
           }`}
-          title={collapsed ? "Logout" : undefined}
-          aria-label="Logout"
         >
           <FiLogOut />
-          {!collapsed ? (
-            <span className="text-sm font-medium">Logout</span>
-          ) : null}
+          {!collapsed && <span className="text-sm font-medium">Logout</span>}
         </button>
       </div>
     </aside>

@@ -14,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 import { loginService } from "../../services/authService";
 import { setAuth } from "../../utils/storage";
+import { toastSuccess, toastError } from "../../utils/toast";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -51,16 +52,20 @@ const Login = () => {
       // ✅ Role check
       if (user.role !== "admin") {
         setError("Access denied. Admin only.");
+        toastError("Access denied. Admin only.");
         return;
       }
 
       // ✅ Store here (NOT in service)
       setAuth(token, user);
-
+      toastSuccess(
+        "Welcome back, " + user.first_name + " " + user.last_name + "!",
+      );
       // ✅ Correct path
       navigate("/admin/dashboard");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Invalid credentials");
+      toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
       setLoading(false);
     }
