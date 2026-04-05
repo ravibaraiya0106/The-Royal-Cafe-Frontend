@@ -25,7 +25,6 @@ const Login = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const navigate = useNavigate();
 
@@ -38,33 +37,29 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
+    if (!form.username || !form.password) {
+      toastError("Please fill all fields");
+      return;
+    }
+
     try {
       setLoading(true);
-      setError("");
-
-      if (!form.username || !form.password) {
-        setError("Please fill all fields");
-        return;
-      }
 
       const { token, user } = await loginService(form);
 
-      // ✅ Role check
       if (user.role !== "admin") {
-        setError("Access denied. Admin only.");
         toastError("Access denied. Admin only.");
         return;
       }
 
-      // ✅ Store here (NOT in service)
       setAuth(token, user);
+
       toastSuccess(
         "Welcome back, " + user.first_name + " " + user.last_name + "!",
       );
-      // ✅ Correct path
+
       navigate("/admin/dashboard");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Invalid credentials");
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
       setLoading(false);
@@ -91,16 +86,6 @@ const Login = () => {
               Welcome back! Please login to continue
             </Typography>
           </div>
-
-          {/* Error */}
-          {error && (
-            <Typography
-              variant="body2"
-              sx={{ color: "red", textAlign: "center", mb: 1 }}
-            >
-              {error}
-            </Typography>
-          )}
 
           {/* Username */}
           <TextField
@@ -151,6 +136,7 @@ const Login = () => {
 
           {/* Button */}
           <Button
+            type="button"
             fullWidth
             variant="contained"
             onClick={handleLogin}

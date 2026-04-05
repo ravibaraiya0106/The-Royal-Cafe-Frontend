@@ -2,9 +2,6 @@ import axios from "axios";
 
 const API = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
-  headers: {
-    "Content-Type": "application/json",
-  },
 });
 
 // Request interceptor
@@ -18,7 +15,7 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-// Response interceptor (error handling)
+// Response interceptor
 API.interceptors.response.use(
   (res) => res,
   (error) => {

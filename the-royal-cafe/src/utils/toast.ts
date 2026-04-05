@@ -20,6 +20,6 @@ export const toastPromise = (promise: Promise<unknown>) => {
   return toast.promise(promise, {
     loading: "Processing...",
     success: "Success 🎉",
-    error: "Something went wrong ❌",
+    error: "Something went wrong ",
   });
 };

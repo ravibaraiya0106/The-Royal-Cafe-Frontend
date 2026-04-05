@@ -1,27 +1,19 @@
-import { loginApi } from "../api/auth.api";
-import { AxiosError } from "axios";
+import { postRequest } from "./apiService";
+import { ENDPOINTS } from "@/api/endpoints";
 
 export const loginService = async (data: {
   username: string;
   password: string;
 }) => {
-  try {
-    const res = await loginApi(data);
+  const res = await postRequest(ENDPOINTS.AUTH.LOGIN, data);
 
-    const { success, message, responseData } = res.data;
+  const { success, message, responseData } = res.data;
 
-    if (!success) {
-      throw new Error(message || "Login failed");
-    }
+  if (!success) throw new Error(message);
 
-    return {
-      token: responseData.token,
-      user: responseData.user,
-    };
-  } catch (err: unknown) {
-    if (err instanceof AxiosError) {
-      throw new Error(err.response?.data?.message || "Login failed");
-    }
-    throw new Error("Login failed");
-  }
+  return {
+    token: responseData.token,
+    user: responseData.user,
+    message,
+  };
 };

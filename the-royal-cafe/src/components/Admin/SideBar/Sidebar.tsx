@@ -6,8 +6,8 @@ import { SIDEBAR_ITEMS } from "../../../constants/Sidebar";
 import logo from "../../../assets/images/logo.png";
 import logo1 from "../../../assets/images/logo1.png";
 
-import { logout } from "../../../utils/storage"; // ✅ import
-import { toastSuccess } from "../../../utils/toast"; // ✅ import
+import { logout } from "../../../utils/storage"; // import
+import { toastSuccess } from "../../../utils/toast"; // import
 
 const Sidebar = ({
   collapsed,
@@ -18,14 +18,14 @@ const Sidebar = ({
 }) => {
   const navigate = useNavigate();
 
-  // ✅ LOGOUT FUNCTION
+  // LOGOUT FUNCTION
   const handleLogout = () => {
     logout(); // clear localStorage
     toastSuccess("Logged out successfully");
 
     setTimeout(() => {
       navigate("/login");
-    }, 10000);
+    }, 1000);
   };
 
   return (
@@ -75,7 +75,7 @@ const Sidebar = ({
       <div className="absolute bottom-4 w-full px-4">
         <button
           type="button"
-          onClick={handleLogout} // ✅ attach here
+          onClick={handleLogout} // attach here
           className={`flex items-center w-full py-2 rounded-xl text-gray-700 hover:bg-red-50 hover:text-red-500 transition ${
             collapsed ? "justify-center px-2" : "gap-3 px-4"
           }`}

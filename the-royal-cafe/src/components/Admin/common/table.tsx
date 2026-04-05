@@ -1,4 +1,5 @@
 import React from "react";
+import Loader from "@/components/common/Loader";
 
 export type Column<T> = {
   header: string;
@@ -19,7 +20,6 @@ const Table = <T extends Record<string, unknown>>({
 }: Props<T>) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-      {/* Table Wrapper */}
       <div className="overflow-hidden border border-gray-200 rounded-xl">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[640px]">
@@ -38,11 +38,8 @@ const Table = <T extends Record<string, unknown>>({
             <tbody className="divide-y divide-gray-100">
               {loading ? (
                 <tr>
-                  <td
-                    colSpan={columns.length}
-                    className="text-center py-8 text-gray-600"
-                  >
-                    Loading...
+                  <td colSpan={columns.length}>
+                    <Loader text="Fetching items..." />
                   </td>
                 </tr>
               ) : data.length === 0 ? (
