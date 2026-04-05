@@ -19,23 +19,13 @@ const FileUpload = ({ file, onChange, error }: Props) => {
 
         <input
           type="file"
-          accept="image/*" // restrict to images
+          accept="image/*"
           onChange={onChange}
           className="hidden"
         />
       </label>
 
-      {/* Error */}
       {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
-
-      {/* Preview */}
-      {file && (
-        <img
-          src={URL.createObjectURL(file)}
-          alt="preview"
-          className="mt-2 w-20 h-20 object-cover rounded-lg border"
-        />
-      )}
     </div>
   );
 };

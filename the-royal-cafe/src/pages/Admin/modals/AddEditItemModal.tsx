@@ -11,32 +11,33 @@ import {
   SecondaryButton,
 } from "@/components/common/form/Button";
 
+import { getCategoryDropdown } from "@/services/itemsService";
+
 type ItemData = {
   name?: string;
   category?: { _id: string };
   description?: string;
   price?: string | number;
-  image?: string | null; // existing image (URL/path)
+  image?: string | null;
   is_active?: boolean;
   is_special?: boolean;
+};
+
+type CategoryOption = {
+  _id: string;
+  name: string;
 };
 
 type Props = {
   open: boolean;
   onClose: () => void;
   onSubmit: (data: FormData) => void;
-  categories: { _id: string; name: string }[];
   initialData?: ItemData | null;
 };
 
-const AddEditItemModal = ({
-  open,
-  onClose,
-  onSubmit,
-  categories,
-  initialData,
-}: Props) => {
+const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
   const [loading, setLoading] = useState(false);
+  const [categories, setCategories] = useState<CategoryOption[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -44,12 +45,26 @@ const AddEditItemModal = ({
     description: "",
     price: "",
     image: null as File | null,
-    existingImage: "" as string | null, // NEW
+    existingImage: "" as string | null,
     is_active: true,
     is_special: false,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  /* ================= FETCH CATEGORIES ================= */
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategoryDropdown();
+        setCategories(data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   /* ================= SET INITIAL DATA ================= */
   useEffect(() => {
@@ -60,7 +75,7 @@ const AddEditItemModal = ({
         description: initialData.description || "",
         price: initialData.price?.toString() || "",
         image: null,
-        existingImage: initialData.image || null, // store existing image
+        existingImage: initialData.image || null,
         is_active: initialData.is_active ?? true,
         is_special: initialData.is_special ?? false,
       });
@@ -83,7 +98,6 @@ const AddEditItemModal = ({
   /* ================= HANDLERS ================= */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
-
     setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
@@ -103,11 +117,10 @@ const AddEditItemModal = ({
         return;
       }
 
-      setForm({
-        ...form,
+      setForm((prev) => ({
+        ...prev,
         image: file,
-        existingImage: null, // remove old preview when new selected
-      });
+      }));
 
       setErrors((prev) => ({ ...prev, image: "" }));
     }
@@ -117,23 +130,14 @@ const AddEditItemModal = ({
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!form.name.trim()) {
-      newErrors.name = "Item name is required";
-    }
-
-    if (!form.category) {
-      newErrors.category = "Category is required";
-    }
-
-    if (!form.price) {
-      newErrors.price = "Price is required";
-    } else if (Number(form.price) <= 0) {
+    if (!form.name.trim()) newErrors.name = "Item name is required";
+    if (!form.category) newErrors.category = "Category is required";
+    if (!form.price) newErrors.price = "Price is required";
+    else if (Number(form.price) <= 0)
       newErrors.price = "Price must be greater than 0";
-    }
 
-    if (form.description && form.description.length < 5) {
+    if (form.description && form.description.length < 5)
       newErrors.description = "Minimum 5 characters required";
-    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -155,7 +159,6 @@ const AddEditItemModal = ({
       formData.append("is_active", String(form.is_active));
       formData.append("is_special", String(form.is_special));
 
-      // Only send image if new one selected
       if (form.image) {
         formData.append("image", form.image);
       }
@@ -186,7 +189,6 @@ const AddEditItemModal = ({
             </Typography>
           </div>
 
-          {/* Name */}
           <InputField
             label="Item Name"
             name="name"
@@ -195,7 +197,6 @@ const AddEditItemModal = ({
             error={errors.name}
           />
 
-          {/* Category */}
           <SelectField
             label="Category"
             name="category"
@@ -208,7 +209,6 @@ const AddEditItemModal = ({
             error={errors.category}
           />
 
-          {/* Price */}
           <InputField
             label="Price"
             name="price"
@@ -218,7 +218,6 @@ const AddEditItemModal = ({
             error={errors.price}
           />
 
-          {/* Description */}
           <TextAreaField
             label="Description"
             name="description"
@@ -227,47 +226,51 @@ const AddEditItemModal = ({
             error={errors.description}
           />
 
-          {/* Upload + Preview Row */}
-          <div className="flex items-start gap-6 mt-4">
-            {/* LEFT SIDE → Images */}
-            <div className="flex gap-4">
-              {/* Existing Image (ONLY if no new image selected) */}
-              {form.existingImage && !form.image && (
-                <div className="flex flex-col items-center">
-                  <p className="text-xs text-gray-500 mb-1">Current</p>
-                  <img
-                    src={`${import.meta.env.VITE_FILE_URL}${form.existingImage}`}
-                    alt="existing"
-                    className="w-20 h-20 object-cover rounded-lg border"
-                  />
-                </div>
-              )}
+          {/* ================= IMAGE SECTION ================= */}
 
-              {/* New Image Preview */}
-              {form.image && (
-                <div className="flex flex-col items-center">
-                  <p className="text-xs text-gray-500 mb-1">New</p>
-                  <img
-                    src={URL.createObjectURL(form.image)}
-                    alt="preview"
-                    className="w-20 h-20 object-cover rounded-lg border"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* RIGHT SIDE → Upload */}
-            <div className="flex-1">
+          {!form.image && !form.existingImage ? (
+            /* ✅ ADD MODE */
+            <div className="w-full">
               <FileUpload file={form.image} onChange={handleFile} />
-
               {errors.image && (
                 <p className="text-red-500 text-xs mt-1">{errors.image}</p>
               )}
             </div>
-          </div>
+          ) : (
+            /* ✅ EDIT MODE / IMAGE SELECTED */
+            <div className="flex items-center gap-6 mt-6">
+              {/* LEFT IMAGES */}
+              <div className="flex gap-4">
+                {form.existingImage && (
+                  <div className="flex flex-col items-center">
+                    <p className="text-xs text-gray-500 mb-1">Current</p>
+                    <img
+                      src={`${import.meta.env.VITE_FILE_URL}${form.existingImage}`}
+                      className="w-20 h-20 rounded-lg border"
+                    />
+                  </div>
+                )}
+
+                {form.image && (
+                  <div className="flex flex-col items-center">
+                    <p className="text-xs text-gray-500 mb-1">New</p>
+                    <img
+                      src={URL.createObjectURL(form.image)}
+                      className="w-20 h-20 rounded-lg border"
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT UPLOAD */}
+              <div className="flex-1">
+                <FileUpload file={form.image} onChange={handleFile} />
+              </div>
+            </div>
+          )}
 
           {/* Switches */}
-          <div className="flex justify-between mt-3">
+          <div className="flex justify-between mt-4">
             <SwitchField
               label="Active"
               name="is_active"
@@ -283,7 +286,7 @@ const AddEditItemModal = ({
             />
           </div>
 
-          {/* Actions */}
+          {/* Buttons */}
           <div className="flex gap-3 mt-5">
             <SecondaryButton label="Cancel" onClick={onClose} />
 

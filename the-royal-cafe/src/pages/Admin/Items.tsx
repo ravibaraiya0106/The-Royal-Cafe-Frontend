@@ -231,7 +231,6 @@ const Items = () => {
         <AddEditItemModal
           open={open}
           onClose={() => setOpen(false)}
-          categories={categories}
           initialData={
             editData
               ? {

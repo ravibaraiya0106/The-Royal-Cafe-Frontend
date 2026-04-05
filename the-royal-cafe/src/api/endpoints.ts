@@ -9,5 +9,6 @@ export const ENDPOINTS = {
     CREATE: "/product/create",
     UPDATE: (id: string) => `/product/update/${id}`,
     DELETE: (id: string) => `/product/delete/${id}`,
+    CATEGORY_DROPDOWN: "/category/dropdown",
   },
 };

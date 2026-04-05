@@ -57,3 +57,13 @@ export const deleteItem = async (id: string) => {
   if (!success) throw new Error(message);
   return message;
 };
+
+/* ================= CATEGORY DROPDOWN ================= */
+export const getCategoryDropdown = async () => {
+  const res = await getRequest(ENDPOINTS.ITEMS.CATEGORY_DROPDOWN);
+  const { success, message, responseData } = res.data;
+
+  if (!success) throw new Error(message);
+
+  return responseData;
+};
