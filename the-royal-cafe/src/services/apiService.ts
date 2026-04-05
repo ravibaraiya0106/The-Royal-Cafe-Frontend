@@ -1,27 +1,49 @@
 import client from "../api/axios";
 import { toFormData } from "../utils/formData";
 
-// GET (no formData needed)
+const isFormData = (data: unknown): data is FormData => {
+  return typeof FormData !== "undefined" && data instanceof FormData;
+};
+
+/* ================= GET ================= */
 export const getRequest = (url: string, params = {}) => {
   return client.get(url, { params });
 };
 
-// POST (always FormData)
-export const postRequest = (url: string, data = {}) => {
-  return client.post(url, toFormData(data));
+/* ================= POST ================= */
+export const postRequest = (url: string, data = {}, isMultipart = false) => {
+  const payload = isMultipart
+    ? isFormData(data)
+      ? data
+      : toFormData(data)
+    : data;
+
+  return client.post(url, payload);
 };
 
-// PUT
-export const putRequest = (url: string, data = {}) => {
-  return client.put(url, toFormData(data));
+/* ================= PUT ================= */
+export const putRequest = (url: string, data = {}, isMultipart = false) => {
+  const payload = isMultipart
+    ? isFormData(data)
+      ? data
+      : toFormData(data)
+    : data;
+
+  return client.put(url, payload);
 };
 
-// PATCH
-export const patchRequest = (url: string, data = {}) => {
-  return client.patch(url, toFormData(data));
+/* ================= PATCH ================= */
+export const patchRequest = (url: string, data = {}, isMultipart = false) => {
+  const payload = isMultipart
+    ? isFormData(data)
+      ? data
+      : toFormData(data)
+    : data;
+
+  return client.patch(url, payload);
 };
 
-// DELETE
+/* ================= DELETE ================= */
 export const deleteRequest = (url: string) => {
   return client.delete(url);
 };

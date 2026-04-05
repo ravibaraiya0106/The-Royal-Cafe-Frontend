@@ -11,9 +11,17 @@ type Props = {
   value: string;
   options: Option[];
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string; // added
 };
 
-const SelectField = ({ label, name, value, options, onChange }: Props) => {
+const SelectField = ({
+  label,
+  name,
+  value,
+  options,
+  onChange,
+  error,
+}: Props) => {
   return (
     <TextField
       select
@@ -23,6 +31,8 @@ const SelectField = ({ label, name, value, options, onChange }: Props) => {
       value={value}
       onChange={onChange}
       margin="normal"
+      error={!!error}
+      helperText={error}
       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
     >
       {options.map((opt) => (

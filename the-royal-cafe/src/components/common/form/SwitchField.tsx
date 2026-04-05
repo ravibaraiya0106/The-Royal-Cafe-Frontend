@@ -5,6 +5,7 @@ type Props = {
   name: string;
   checked: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean; // optional
 };
 
 const SwitchField = ({ label, name, checked, onChange }: Props) => {

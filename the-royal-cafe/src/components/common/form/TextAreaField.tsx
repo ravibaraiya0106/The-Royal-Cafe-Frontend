@@ -5,9 +5,10 @@ type Props = {
   name: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  error?: string; // added
 };
 
-const TextAreaField = ({ label, name, value, onChange }: Props) => {
+const TextAreaField = ({ label, name, value, onChange, error }: Props) => {
   return (
     <TextField
       fullWidth
@@ -18,6 +19,8 @@ const TextAreaField = ({ label, name, value, onChange }: Props) => {
       value={value}
       onChange={onChange}
       margin="normal"
+      error={!!error}
+      helperText={error}
       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
     />
   );

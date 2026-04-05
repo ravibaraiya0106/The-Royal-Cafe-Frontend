@@ -16,7 +16,7 @@ type ItemData = {
   category?: { _id: string };
   description?: string;
   price?: string | number;
-  image?: string | null;
+  image?: string | null; // existing image (URL/path)
   is_active?: boolean;
   is_special?: boolean;
 };
@@ -24,7 +24,7 @@ type ItemData = {
 type Props = {
   open: boolean;
   onClose: () => void;
-  onSubmit: (data: unknown) => void;
+  onSubmit: (data: FormData) => void;
   categories: { _id: string; name: string }[];
   initialData?: ItemData | null;
 };
@@ -44,10 +44,14 @@ const AddEditItemModal = ({
     description: "",
     price: "",
     image: null as File | null,
+    existingImage: "" as string | null, // NEW
     is_active: true,
     is_special: false,
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  /* ================= SET INITIAL DATA ================= */
   useEffect(() => {
     if (initialData) {
       setForm({
@@ -56,14 +60,31 @@ const AddEditItemModal = ({
         description: initialData.description || "",
         price: initialData.price?.toString() || "",
         image: null,
+        existingImage: initialData.image || null, // store existing image
         is_active: initialData.is_active ?? true,
         is_special: initialData.is_special ?? false,
       });
+    } else {
+      setForm({
+        name: "",
+        category: "",
+        description: "",
+        price: "",
+        image: null,
+        existingImage: null,
+        is_active: true,
+        is_special: false,
+      });
     }
-  }, [initialData]);
 
+    setErrors({});
+  }, [initialData, open]);
+
+  /* ================= HANDLERS ================= */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+
+    setErrors((prev) => ({ ...prev, [e.target.name]: "" }));
   };
 
   const handleSwitch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,12 +93,55 @@ const AddEditItemModal = ({
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
-      setForm({ ...form, image: e.target.files[0] });
+      const file = e.target.files[0];
+
+      if (file.size > 2 * 1024 * 1024) {
+        setErrors((prev) => ({
+          ...prev,
+          image: "Image must be less than 2MB",
+        }));
+        return;
+      }
+
+      setForm({
+        ...form,
+        image: file,
+        existingImage: null, // remove old preview when new selected
+      });
+
+      setErrors((prev) => ({ ...prev, image: "" }));
     }
   };
 
+  /* ================= VALIDATION ================= */
+  const validate = () => {
+    const newErrors: Record<string, string> = {};
+
+    if (!form.name.trim()) {
+      newErrors.name = "Item name is required";
+    }
+
+    if (!form.category) {
+      newErrors.category = "Category is required";
+    }
+
+    if (!form.price) {
+      newErrors.price = "Price is required";
+    } else if (Number(form.price) <= 0) {
+      newErrors.price = "Price must be greater than 0";
+    }
+
+    if (form.description && form.description.length < 5) {
+      newErrors.description = "Minimum 5 characters required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
-    if (!form.name || !form.category || !form.price) return;
+    if (!validate()) return;
 
     try {
       setLoading(true);
@@ -91,6 +155,7 @@ const AddEditItemModal = ({
       formData.append("is_active", String(form.is_active));
       formData.append("is_special", String(form.is_special));
 
+      // Only send image if new one selected
       if (form.image) {
         formData.append("image", form.image);
       }
@@ -127,6 +192,7 @@ const AddEditItemModal = ({
             name="name"
             value={form.name}
             onChange={handleChange}
+            error={errors.name}
           />
 
           {/* Category */}
@@ -139,6 +205,7 @@ const AddEditItemModal = ({
               label: c.name,
               value: c._id,
             }))}
+            error={errors.category}
           />
 
           {/* Price */}
@@ -148,6 +215,7 @@ const AddEditItemModal = ({
             type="number"
             value={form.price}
             onChange={handleChange}
+            error={errors.price}
           />
 
           {/* Description */}
@@ -156,10 +224,47 @@ const AddEditItemModal = ({
             name="description"
             value={form.description}
             onChange={handleChange}
+            error={errors.description}
           />
 
-          {/* Upload */}
-          <FileUpload file={form.image} onChange={handleFile} />
+          {/* Upload + Preview Row */}
+          <div className="flex items-start gap-6 mt-4">
+            {/* LEFT SIDE → Images */}
+            <div className="flex gap-4">
+              {/* Existing Image (ONLY if no new image selected) */}
+              {form.existingImage && !form.image && (
+                <div className="flex flex-col items-center">
+                  <p className="text-xs text-gray-500 mb-1">Current</p>
+                  <img
+                    src={`${import.meta.env.VITE_FILE_URL}${form.existingImage}`}
+                    alt="existing"
+                    className="w-20 h-20 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+
+              {/* New Image Preview */}
+              {form.image && (
+                <div className="flex flex-col items-center">
+                  <p className="text-xs text-gray-500 mb-1">New</p>
+                  <img
+                    src={URL.createObjectURL(form.image)}
+                    alt="preview"
+                    className="w-20 h-20 object-cover rounded-lg border"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* RIGHT SIDE → Upload */}
+            <div className="flex-1">
+              <FileUpload file={form.image} onChange={handleFile} />
+
+              {errors.image && (
+                <p className="text-red-500 text-xs mt-1">{errors.image}</p>
+              )}
+            </div>
+          </div>
 
           {/* Switches */}
           <div className="flex justify-between mt-3">

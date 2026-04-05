@@ -17,6 +17,7 @@ import {
   deleteItem,
   createItem,
   updateItem,
+  getItemById,
 } from "@/services/itemsService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import ConfirmDialog from "./modals/ConfirmDialog";
@@ -26,7 +27,7 @@ type Item = {
   name: string;
   price: number;
   description: string;
-  category: { _id: string; name: string } | string;
+  category: { _id: string; name?: string } | string;
   image?: string;
   is_special: boolean;
   is_active: boolean;
@@ -38,6 +39,7 @@ const Items = () => {
 
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false); // separate loading
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -63,6 +65,23 @@ const Items = () => {
       toastError("Failed to fetch items");
     } finally {
       setLoading(false);
+    }
+  };
+
+  /* ================= EDIT ================= */
+  const handleEdit = async (id: string) => {
+    try {
+      setOpen(true); // open immediately
+      setEditLoading(true); // show loader inside modal
+
+      const data = await getItemById(id);
+
+      setEditData(data);
+    } catch (err: unknown) {
+      toastError(err instanceof Error ? err.message : "Failed to fetch item");
+      setOpen(false); // optional: close if failed
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -162,20 +181,21 @@ const Items = () => {
       accessor: "_id",
       render: (row) => (
         <div className="flex items-center gap-4">
+          {/* VIEW (future use) */}
           <button className="text-blue-500">
             <FiEye size={18} />
           </button>
 
+          {/* EDIT */}
           <button
-            onClick={() => {
-              setEditData(row);
-              setOpen(true);
-            }}
-            className="text-fg-brand"
+            onClick={() => handleEdit(row._id)}
+            disabled={editLoading}
+            className="text-fg-brand disabled:opacity-50"
           >
             <FiEdit size={18} />
           </button>
 
+          {/* DELETE */}
           <button
             onClick={() => {
               setSelectedId(row._id);
@@ -199,6 +219,7 @@ const Items = () => {
 
         <Table columns={columns} data={items} loading={loading} />
 
+        {/* ADD BUTTON */}
         <AddButton
           onClick={() => {
             setEditData(null);
@@ -206,6 +227,7 @@ const Items = () => {
           }}
         />
 
+        {/* MODAL */}
         <AddEditItemModal
           open={open}
           onClose={() => setOpen(false)}
@@ -217,7 +239,7 @@ const Items = () => {
                   category:
                     typeof editData.category === "string"
                       ? { _id: editData.category }
-                      : editData.category,
+                      : { _id: editData.category._id }, // FIXED
                 }
               : undefined
           }
@@ -242,6 +264,7 @@ const Items = () => {
         />
       </div>
 
+      {/* DELETE CONFIRM */}
       <ConfirmDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}

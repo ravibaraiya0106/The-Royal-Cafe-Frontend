@@ -6,9 +6,17 @@ type Props = {
   value: string | number;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
+  error?: string; // added
 };
 
-const InputField = ({ label, name, value, onChange, type = "text" }: Props) => {
+const InputField = ({
+  label,
+  name,
+  value,
+  onChange,
+  type = "text",
+  error,
+}: Props) => {
   return (
     <TextField
       fullWidth
@@ -18,6 +26,8 @@ const InputField = ({ label, name, value, onChange, type = "text" }: Props) => {
       type={type}
       onChange={onChange}
       margin="normal"
+      error={!!error}
+      helperText={error}
       sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
     />
   );
