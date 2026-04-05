@@ -5,6 +5,7 @@ export type Column<T> = {
   header: string;
   accessor: keyof T;
   render?: (row: T) => React.ReactNode;
+  align?: "left" | "center" | "right";
 };
 
 type Props<T> = {
@@ -27,7 +28,16 @@ const Table = <T extends Record<string, unknown>>({
             <thead className="bg-brand text-white">
               <tr>
                 {columns.map((col, index) => (
-                  <th key={index} className="px-4 py-3 font-semibold">
+                  <th
+                    key={index}
+                    className={`px-4 py-3 font-semibold ${
+                      col.align === "center"
+                        ? "text-center"
+                        : col.align === "right"
+                          ? "text-right"
+                          : "text-left"
+                    }`}
+                  >
                     {col.header}
                   </th>
                 ))}
@@ -58,7 +68,16 @@ const Table = <T extends Record<string, unknown>>({
                     className="hover:bg-brand/5 transition-colors"
                   >
                     {columns.map((col, colIndex) => (
-                      <td key={colIndex} className="px-4 py-3 text-gray-700">
+                      <td
+                        key={colIndex}
+                        className={`px-4 py-3 text-gray-700 ${
+                          col.align === "center"
+                            ? "text-center"
+                            : col.align === "right"
+                              ? "text-right"
+                              : "text-left"
+                        }`}
+                      >
                         {col.render
                           ? col.render(row)
                           : String(row[col.accessor] ?? "")}

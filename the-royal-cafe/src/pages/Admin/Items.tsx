@@ -1,17 +1,10 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
-import {
-  FiEdit,
-  FiTrash,
-  FiEye,
-  FiAward,
-  FiCheckCircle,
-  FiXCircle,
-} from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiAward } from "react-icons/fi";
 import AdminLayout from "@/Layouts/AdminLayout";
 import AddButton from "../../components/Admin/common/AddButton";
-import AddEditItemModal from "./modals/AddEditItemModal";
+import AddEditItemModal from "../../components/Admin/modals/AddEditItemModal";
 import {
   itemsList,
   deleteItem,
@@ -20,7 +13,8 @@ import {
   getItemById,
 } from "@/services/itemsService";
 import { toastSuccess, toastError } from "@/utils/toast";
-import ConfirmDialog from "./modals/ConfirmDialog";
+import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
+import Filter from "@/components/Admin/common/Filter";
 
 type Item = {
   _id: string;
@@ -30,7 +24,13 @@ type Item = {
   category: { _id: string; name?: string } | string;
   image?: string;
   is_special: boolean;
-  is_active: boolean;
+};
+
+type FilterField = {
+  key: string;
+  label: string;
+  type: "text" | "select";
+  options?: { label: string; value: string | number }[];
 };
 
 const Items = () => {
@@ -44,22 +44,96 @@ const Items = () => {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
 
-  const categories = [
-    { _id: "1", name: "Pizza" },
-    { _id: "2", name: "Burger" },
+  const filterFields: FilterField[] = [
+    { key: "name", label: "Search Name", type: "text" },
+
+    {
+      key: "category",
+      label: "Category",
+      type: "select",
+      options: [
+        ...new Map(
+          items.map((item) => [
+            typeof item.category === "string"
+              ? item.category
+              : item.category?._id,
+            {
+              label:
+                typeof item.category === "string"
+                  ? item.category
+                  : item.category?.name || "",
+              value:
+                typeof item.category === "string"
+                  ? item.category
+                  : item.category?._id,
+            },
+          ]),
+        ).values(),
+      ],
+    },
+
+    {
+      key: "is_special",
+      label: "Special",
+      type: "select",
+      options: [
+        { label: "Special", value: "true" },
+        { label: "Regular", value: "false" },
+      ],
+    },
   ];
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 10,
+    name: "",
+    category: "",
+    is_special: "",
+  });
+  const handleFilterChange = (values: Record<string, unknown>) => {
+    let data = [...items];
 
+    // NAME FILTER
+    if (values.name) {
+      data = data.filter((item) =>
+        item.name.toLowerCase().includes(String(values.name).toLowerCase()),
+      );
+    }
+
+    // CATEGORY FILTER
+    if (values.category) {
+      data = data.filter((item) => {
+        const categoryId =
+          typeof item.category === "string"
+            ? item.category
+            : item.category?._id;
+
+        return categoryId === values.category;
+      });
+    }
+
+    // SPECIAL FILTER
+    if (values.is_special !== undefined && values.is_special !== "") {
+      const isSpecial = values.is_special === "true";
+
+      data = data.filter((item) => item.is_special === isSpecial);
+    }
+
+    setFilteredItems(data);
+  };
   /* ================= FETCH ================= */
   useEffect(() => {
     fetchItems();
   }, []);
 
-  const fetchItems = async () => {
+  const fetchItems = async (customFilters = filters) => {
     try {
       setLoading(true);
-      const data = await itemsList();
-      setItems(data);
+
+      const res = await itemsList(customFilters);
+
+      setItems(res.data);
     } catch (err) {
       console.error(err);
       toastError("Failed to fetch items");
@@ -67,7 +141,6 @@ const Items = () => {
       setLoading(false);
     }
   };
-
   /* ================= EDIT ================= */
   const handleEdit = async (id: string) => {
     try {
@@ -111,7 +184,14 @@ const Items = () => {
   const columns: Column<Item>[] = [
     { header: "Name", accessor: "name" },
     { header: "Price", accessor: "price" },
-    { header: "Description", accessor: "description" },
+    {
+      header: "Description",
+      accessor: "description",
+      render: (row) =>
+        row.description.length > 70
+          ? row.description.slice(0, 70) + "..."
+          : row.description,
+    },
 
     {
       header: "Category",
@@ -140,6 +220,7 @@ const Items = () => {
     {
       header: "Special",
       accessor: "is_special",
+      align: "center",
       render: (row) => (
         <div className="flex justify-center">
           <div
@@ -154,24 +235,6 @@ const Items = () => {
               className={row.is_special ? "animate-pulse" : ""}
             />
           </div>
-        </div>
-      ),
-    },
-
-    {
-      header: "Status",
-      accessor: "is_active",
-      render: (row) => (
-        <div className="flex justify-center">
-          {row.is_active ? (
-            <div className="p-1.5 rounded-full bg-green-100 text-green-600">
-              <FiCheckCircle size={14} />
-            </div>
-          ) : (
-            <div className="p-1.5 rounded-full bg-red-100 text-red-600">
-              <FiXCircle size={14} />
-            </div>
-          )}
         </div>
       ),
     },
@@ -216,8 +279,8 @@ const Items = () => {
         <h1 className="text-xl font-semibold mb-4 text-center text-brand">
           Items
         </h1>
-
-        <Table columns={columns} data={items} loading={loading} />
+        <Filter filters={filterFields} onChange={handleFilterChange} />
+        <Table columns={columns} data={filteredItems} loading={loading} />
 
         {/* ADD BUTTON */}
         <AddButton

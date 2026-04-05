@@ -7,8 +7,8 @@ import {
 import { ENDPOINTS } from "@/api/endpoints";
 
 /* ================= GET ALL ================= */
-export const itemsList = async () => {
-  const res = await getRequest(ENDPOINTS.ITEMS.GET_ALL);
+export const itemsList = async (params?: Record<string, unknown>) => {
+  const res = await getRequest(ENDPOINTS.ITEMS.GET_ALL, { params });
 
   const { success, message, responseData } = res.data;
 
