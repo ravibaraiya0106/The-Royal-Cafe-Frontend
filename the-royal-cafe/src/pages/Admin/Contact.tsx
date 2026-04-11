@@ -3,7 +3,7 @@ import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
 import { FiTrash, FiEye } from "react-icons/fi";
 import AdminLayout from "@/Layouts/AdminLayout";
-import { contactsList, deleteContact } from "@/services/contactService";
+import { contactsList, deleteContact } from "@/services/contactsService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
 import Filter from "@/components/Admin/common/Filter";
@@ -211,7 +211,7 @@ const Contact = () => {
     <AdminLayout>
       <div className="p-6">
         <h1 className="text-xl font-semibold mb-4 text-center text-brand">
-          Categories
+          Contact Messages
         </h1>
 
         <Filter filters={filterFields} onChange={handleFilterChange} />

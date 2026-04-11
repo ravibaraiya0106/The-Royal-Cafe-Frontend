@@ -27,4 +27,9 @@ export const ENDPOINTS = {
     GET_BY_ID: (id: string) => `/contact/${id}`,
     DELETE: (id: string) => `/contact/delete/${id}`,
   },
+  REVIEWS: {
+    GET_ALL: "/review/list",
+    GET_BY_ID: (id: string) => `/review/${id}`,
+    DELETE: (id: string) => `/review/delete/${id}`,
+  },
 };
