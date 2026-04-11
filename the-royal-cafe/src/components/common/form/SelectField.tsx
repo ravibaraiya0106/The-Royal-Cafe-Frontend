@@ -26,6 +26,7 @@ const SelectField = ({
     <TextField
       select
       fullWidth
+      size="small"
       label={label}
       name={name}
       value={value}
@@ -33,7 +34,7 @@ const SelectField = ({
       margin="normal"
       error={!!error}
       helperText={error}
-      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "5px" }, margin: 0 }}
     >
       {options.map((opt) => (
         <MenuItem key={opt.value} value={opt.value}>

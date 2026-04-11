@@ -27,7 +27,7 @@ export const PrimaryButton = ({
       disabled={loading}
       startIcon={!loading && icon}
       sx={{
-        borderRadius: "12px",
+        borderRadius: "5px",
         textTransform: "none",
         fontWeight: 600,
         background: "linear-gradient(135deg, #6b0f0f, #8b1a1a)",
@@ -55,7 +55,7 @@ export const SecondaryButton = ({
       variant="outlined"
       onClick={onClick}
       sx={{
-        borderRadius: "12px",
+        borderRadius: "5px",
         textTransform: "none",
         fontWeight: 500,
         borderColor: "brand",
@@ -84,7 +84,7 @@ export const DangerButton = ({
       variant="contained"
       onClick={onClick}
       sx={{
-        borderRadius: "12px",
+        borderRadius: "5px",
         textTransform: "none",
         fontWeight: 600,
         background: "#ef4444",
@@ -131,7 +131,7 @@ export const SmallButton = ({ label, onClick }: BaseProps) => {
       size="small"
       onClick={onClick}
       sx={{
-        borderRadius: "8px",
+        borderRadius: "5px",
         textTransform: "none",
         fontSize: "12px",
         px: 2,

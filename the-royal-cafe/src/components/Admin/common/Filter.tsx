@@ -1,16 +1,20 @@
-import { TextField, MenuItem, Paper } from "@mui/material";
-import { useState, useEffect } from "react";
+import { Paper } from "@mui/material";
+import { useState, useRef } from "react";
+
+import InputField from "@/components/common/form/InputField";
+import SelectField from "@/components/common/form/SelectField";
+import { PrimaryButton } from "@/components/common/form/Button";
 
 type Option = {
   label: string;
-  value: string | number;
+  value: string;
 };
 
 type FilterField = {
   key: string;
   label: string;
   type: "text" | "select";
-  options?: Option[]; // only for select
+  options?: Option[];
 };
 
 type Props = {
@@ -21,66 +25,74 @@ type Props = {
 const Filter = ({ filters, onChange }: Props) => {
   const [values, setValues] = useState<Record<string, unknown>>({});
 
-  // update parent when filters change
-  useEffect(() => {
-    onChange(values);
-  }, [values]);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = (key: string, value: unknown) => {
-    setValues((prev) => ({
-      ...prev,
+    const updatedValues = {
+      ...values,
       [key]: value,
-    }));
-  };
+    };
 
+    setValues(updatedValues);
+
+    // Apply debounce only for "name"
+    if (key === "name") {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+
+      debounceRef.current = setTimeout(() => {
+        onChange(updatedValues);
+      }, 1000); // 5 seconds
+    } else {
+      // Immediate for dropdowns
+      onChange(updatedValues);
+    }
+  };
+  /* ================= RESET ================= */
   const handleReset = () => {
     setValues({});
+    onChange({}); // important (reload full data)
   };
 
   return (
     <Paper
       elevation={0}
-      className="p-4 mb-4 border rounded-xl flex flex-wrap gap-4 items-end"
+      className="p-4 mb-4 bg-white rounded-[5px] shadow-sm border border-gray-200 flex flex-wrap gap-4 items-end"
     >
       {filters.map((filter) => (
         <div key={filter.key} className="min-w-[200px] flex-1">
+          {/* TEXT INPUT */}
           {filter.type === "text" && (
-            <TextField
-              fullWidth
-              size="small"
+            <InputField
               label={filter.label}
-              value={values[filter.key] || ""}
-              onChange={(e) => handleChange(filter.key, e.target.value)}
+              name={filter.key}
+              value={(values[filter.key] as string) || ""}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleChange(filter.key, e.target.value)
+              }
             />
           )}
 
+          {/* SELECT INPUT */}
           {filter.type === "select" && (
-            <TextField
-              select
-              fullWidth
-              size="small"
+            <SelectField
               label={filter.label}
-              value={values[filter.key] ?? ""}
-              onChange={(e) => handleChange(filter.key, e.target.value)}
-            >
-              <MenuItem value="">All</MenuItem>
-              {filter.options?.map((opt) => (
-                <MenuItem key={String(opt.value)} value={String(opt.value)}>
-                  {opt.label}
-                </MenuItem>
-              ))}
-            </TextField>
+              name={filter.key}
+              value={(values[filter.key] as string) || ""}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                handleChange(filter.key, e.target.value)
+              }
+              options={[{ label: "All", value: "" }, ...(filter.options || [])]}
+            />
           )}
         </div>
       ))}
 
-      {/* RESET BUTTON */}
-      <button
-        onClick={handleReset}
-        className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200"
-      >
-        Reset
-      </button>
+      {/* RIGHT SIDE BUTTON */}
+      <div className="flex justify-end pb-1">
+        <PrimaryButton onClick={handleReset} label="Reset" />
+      </div>
     </Paper>
   );
 };

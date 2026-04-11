@@ -9,7 +9,7 @@ type Props = {
 const FileUpload = ({ file, onChange, error }: Props) => {
   return (
     <div className="mt-4">
-      <label className="w-full flex items-center justify-between border border-gray-300 rounded-xl px-4 py-3 cursor-pointer hover:border-brand transition">
+      <label className="w-full h-10 flex items-center justify-between border border-gray-300 rounded-[5px] px-4 py-3 cursor-pointer hover:border-brand transition">
         <div className="flex items-center gap-2 text-gray-600">
           <FiUpload size={18} />
           <span className="text-sm">{file ? file.name : "Upload Image"}</span>

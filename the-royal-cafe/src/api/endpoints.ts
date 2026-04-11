@@ -11,4 +11,11 @@ export const ENDPOINTS = {
     DELETE: (id: string) => `/product/delete/${id}`,
     CATEGORY_DROPDOWN: "/category/dropdown",
   },
+  CATEGORIES: {
+    GET_ALL: "/category/list",
+    GET_BY_ID: (id: string) => `/category/${id}`,
+    CREATE: "/category/create",
+    UPDATE: (id: string) => `/category/update/${id}`,
+    DELETE: (id: string) => `/category/delete/${id}`,
+  },
 };

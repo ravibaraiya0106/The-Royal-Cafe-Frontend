@@ -175,10 +175,10 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
         <Paper
           elevation={0}
           sx={{
-            height: "90vh",
+            minHeight: "75vh",
             display: "flex",
             flexDirection: "column",
-            borderRadius: "20px",
+            borderRadius: "5px",
             border: "1px solid #e5e7eb",
           }}
         >
@@ -194,7 +194,7 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
           </div>
 
           {/* ================= BODY ================= */}
-          <div className="flex-1 overflow-y-auto px-4 py-3">
+          <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             <InputField
               label="Item Name"
               name="name"

@@ -12,6 +12,7 @@ const TextAreaField = ({ label, name, value, onChange, error }: Props) => {
   return (
     <TextField
       fullWidth
+      size="small"
       multiline
       rows={3}
       label={label}
@@ -21,7 +22,7 @@ const TextAreaField = ({ label, name, value, onChange, error }: Props) => {
       margin="normal"
       error={!!error}
       helperText={error}
-      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "5px" } }}
     />
   );
 };

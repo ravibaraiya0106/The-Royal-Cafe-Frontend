@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
 import { FiEdit, FiTrash, FiEye, FiAward } from "react-icons/fi";
@@ -11,10 +11,13 @@ import {
   createItem,
   updateItem,
   getItemById,
+  getCategoryDropdown,
 } from "@/services/itemsService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
 import Filter from "@/components/Admin/common/Filter";
+import ShowDetailsModal from "@/components/Admin/modals/ShowDetailsModal";
+import Pagination from "@/components/Admin/common/Pagination";
 
 type Item = {
   _id: string;
@@ -30,7 +33,7 @@ type FilterField = {
   key: string;
   label: string;
   type: "text" | "select";
-  options?: { label: string; value: string | number }[];
+  options?: { label: string; value: string }[];
 };
 
 const Items = () => {
@@ -39,120 +42,126 @@ const Items = () => {
 
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
-  const [editLoading, setEditLoading] = useState(false); // separate loading
+  const [editLoading, setEditLoading] = useState(false);
 
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
-  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
 
-  const filterFields: FilterField[] = [
-    { key: "name", label: "Search Name", type: "text" },
+  const [viewOpen, setViewOpen] = useState(false);
+  const [viewData, setViewData] = useState<Item | null>(null);
 
-    {
-      key: "category",
-      label: "Category",
-      type: "select",
-      options: [
-        ...new Map(
-          items.map((item) => [
-            typeof item.category === "string"
-              ? item.category
-              : item.category?._id,
-            {
-              label:
-                typeof item.category === "string"
-                  ? item.category
-                  : item.category?.name || "",
-              value:
-                typeof item.category === "string"
-                  ? item.category
-                  : item.category?._id,
-            },
-          ]),
-        ).values(),
-      ],
-    },
+  const [categories, setCategories] = useState<
+    { label: string; value: string }[]
+  >([]);
 
-    {
-      key: "is_special",
-      label: "Special",
-      type: "select",
-      options: [
-        { label: "Special", value: "true" },
-        { label: "Regular", value: "false" },
-      ],
-    },
-  ];
   const [filters, setFilters] = useState({
+    page: 1,
+    limit: 1,
+    name: "",
+    category: "",
+    is_special: "",
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+  });
+  /* ================= FETCH ITEMS ================= */
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const fetchItems = useCallback(
+    async (params = filters) => {
+      try {
+        setLoading(true);
+
+        const res = await itemsList(params);
+
+        setItems(res.data);
+        setPagination({
+          page: res.page,
+          totalPages: res.totalPages,
+        });
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (err) {
+        toastError("Failed to fetch items");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [filters],
+  );
+
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
+
+  /* ================= FETCH CATEGORIES ================= */
+  const fetchCategories = async () => {
+    try {
+      const res = await getCategoryDropdown();
+
+      const options = res.map((cat: { name: string; _id: string }) => ({
+        label: cat.name,
+        value: cat._id,
+      }));
+
+      setCategories(options);
+    } catch (err) {
+      console.error(err);
+      toastError("Failed to fetch categories");
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    fetchItems(filters);
+  }, [fetchItems, filters]);
+
+  const defaultFilters = {
     page: 1,
     limit: 10,
     name: "",
     category: "",
     is_special: "",
-  });
+  };
+  /* ================= FILTER ================= */
   const handleFilterChange = (values: Record<string, unknown>) => {
-    let data = [...items];
-
-    // NAME FILTER
-    if (values.name) {
-      data = data.filter((item) =>
-        item.name.toLowerCase().includes(String(values.name).toLowerCase()),
-      );
+    // if reset
+    if (Object.keys(values).length === 0) {
+      setFilters(defaultFilters);
+      return;
     }
 
-    // CATEGORY FILTER
-    if (values.category) {
-      data = data.filter((item) => {
-        const categoryId =
-          typeof item.category === "string"
-            ? item.category
-            : item.category?._id;
-
-        return categoryId === values.category;
-      });
-    }
-
-    // SPECIAL FILTER
-    if (values.is_special !== undefined && values.is_special !== "") {
-      const isSpecial = values.is_special === "true";
-
-      data = data.filter((item) => item.is_special === isSpecial);
-    }
-
-    setFilteredItems(data);
+    // normal filter
+    setFilters((prev) => ({
+      ...prev,
+      ...values,
+      page: 1,
+    }));
   };
-  /* ================= FETCH ================= */
-  useEffect(() => {
-    fetchItems();
-  }, []);
 
-  const fetchItems = async (customFilters = filters) => {
-    try {
-      setLoading(true);
-
-      const res = await itemsList(customFilters);
-
-      setItems(res.data);
-    } catch (err) {
-      console.error(err);
-      toastError("Failed to fetch items");
-    } finally {
-      setLoading(false);
-    }
+  /* ================= VIEW ================= */
+  const handleView = (item: Item) => {
+    setViewData(item);
+    setViewOpen(true);
   };
+
   /* ================= EDIT ================= */
   const handleEdit = async (id: string) => {
     try {
-      setOpen(true); // open immediately
-      setEditLoading(true); // show loader inside modal
+      setOpen(true);
+      setEditLoading(true);
 
       const data = await getItemById(id);
-
       setEditData(data);
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Failed to fetch item");
-      setOpen(false); // optional: close if failed
+      setOpen(false);
     } finally {
       setEditLoading(false);
     }
@@ -172,7 +181,7 @@ const Items = () => {
       setDeleteOpen(false);
       setSelectedId(null);
 
-      fetchItems();
+      fetchItems(filters);
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -180,7 +189,27 @@ const Items = () => {
     }
   };
 
-  /* ================= COLUMNS ================= */
+  /* ================= FILTER FIELDS ================= */
+  const filterFields: FilterField[] = [
+    { key: "name", label: "Search Name", type: "text" },
+    {
+      key: "category",
+      label: "Category",
+      type: "select",
+      options: categories,
+    },
+    {
+      key: "is_special",
+      label: "Type",
+      type: "select",
+      options: [
+        { label: "Special", value: "true" },
+        { label: "Regular", value: "false" },
+      ],
+    },
+  ];
+
+  /* ================= TABLE ================= */
   const columns: Column<Item>[] = [
     { header: "Name", accessor: "name" },
     { header: "Price", accessor: "price" },
@@ -192,14 +221,12 @@ const Items = () => {
           ? row.description.slice(0, 70) + "..."
           : row.description,
     },
-
     {
       header: "Category",
       accessor: "category",
       render: (row) =>
         typeof row.category === "string" ? row.category : row.category?.name,
     },
-
     {
       header: "Image",
       accessor: "image",
@@ -216,7 +243,6 @@ const Items = () => {
           </div>
         ),
     },
-
     {
       header: "Special",
       accessor: "is_special",
@@ -238,18 +264,15 @@ const Items = () => {
         </div>
       ),
     },
-
     {
       header: "Action",
       accessor: "_id",
       render: (row) => (
         <div className="flex items-center gap-4">
-          {/* VIEW (future use) */}
-          <button className="text-blue-500">
+          <button onClick={() => handleView(row)} className="text-blue-500">
             <FiEye size={18} />
           </button>
 
-          {/* EDIT */}
           <button
             onClick={() => handleEdit(row._id)}
             disabled={editLoading}
@@ -258,7 +281,6 @@ const Items = () => {
             <FiEdit size={18} />
           </button>
 
-          {/* DELETE */}
           <button
             onClick={() => {
               setSelectedId(row._id);
@@ -279,10 +301,15 @@ const Items = () => {
         <h1 className="text-xl font-semibold mb-4 text-center text-brand">
           Items
         </h1>
-        <Filter filters={filterFields} onChange={handleFilterChange} />
-        <Table columns={columns} data={filteredItems} loading={loading} />
 
-        {/* ADD BUTTON */}
+        <Filter filters={filterFields} onChange={handleFilterChange} />
+
+        <Table columns={columns} data={items} loading={loading} />
+        <Pagination
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          onPageChange={handlePageChange}
+        />
         <AddButton
           onClick={() => {
             setEditData(null);
@@ -290,7 +317,6 @@ const Items = () => {
           }}
         />
 
-        {/* MODAL */}
         <AddEditItemModal
           open={open}
           onClose={() => setOpen(false)}
@@ -301,7 +327,7 @@ const Items = () => {
                   category:
                     typeof editData.category === "string"
                       ? { _id: editData.category }
-                      : { _id: editData.category._id }, // FIXED
+                      : { _id: editData.category._id },
                 }
               : undefined
           }
@@ -316,7 +342,7 @@ const Items = () => {
               }
 
               setOpen(false);
-              fetchItems();
+              fetchItems(filters);
             } catch (err: unknown) {
               toastError(
                 err instanceof Error ? err.message : "Something went wrong",
@@ -326,12 +352,38 @@ const Items = () => {
         />
       </div>
 
-      {/* DELETE CONFIRM */}
       <ConfirmDialog
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
         loading={deleteLoading}
+      />
+
+      <ShowDetailsModal
+        open={viewOpen}
+        onClose={() => setViewOpen(false)}
+        title="Item Details"
+        image={
+          viewData?.image
+            ? `${import.meta.env.VITE_FILE_URL}${viewData.image}`
+            : null
+        }
+        fields={[
+          { label: "Name", value: viewData?.name },
+          { label: "Price", value: viewData?.price },
+          {
+            label: "Category",
+            value:
+              typeof viewData?.category === "string"
+                ? viewData?.category
+                : viewData?.category?.name,
+          },
+          { label: "Description", value: viewData?.description },
+          {
+            label: "Special",
+            value: viewData?.is_special ? "Yes" : "No",
+          },
+        ]}
       />
     </AdminLayout>
   );

@@ -20,8 +20,8 @@ const Table = <T extends Record<string, unknown>>({
   loading = false,
 }: Props<T>) => {
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-4">
-      <div className="overflow-hidden border border-gray-200 rounded-xl">
+    <div className="bg-white rounded-[5px] shadow-sm border border-gray-200 p-4">
+      <div className="overflow-hidden border border-gray-200 rounded-[5px]">
         <div className="overflow-x-auto">
           <table className="w-full text-sm text-left border-collapse min-w-[640px]">
             {/* Header */}

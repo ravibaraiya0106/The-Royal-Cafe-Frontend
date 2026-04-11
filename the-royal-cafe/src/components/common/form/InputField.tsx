@@ -20,6 +20,7 @@ const InputField = ({
   return (
     <TextField
       fullWidth
+      size="small"
       label={label}
       name={name}
       value={value}
@@ -28,7 +29,7 @@ const InputField = ({
       margin="normal"
       error={!!error}
       helperText={error}
-      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px" } }}
+      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "5px" }, margin: 0 }}
     />
   );
 };
