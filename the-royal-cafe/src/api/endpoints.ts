@@ -18,4 +18,8 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/category/update/${id}`,
     DELETE: (id: string) => `/category/delete/${id}`,
   },
+  CUSTOMERS: {
+    GET_ALL: "/user/list",
+    DELETE: (id: string) => `/user/delete/${id}`,
+  },
 };

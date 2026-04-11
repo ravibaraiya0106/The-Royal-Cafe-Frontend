@@ -36,7 +36,14 @@ const Filter = ({ filters, onChange }: Props) => {
     setValues(updatedValues);
 
     // Apply debounce only for "name"
-    if (key === "name") {
+    if (
+      key === "name" ||
+      key === "username" ||
+      key === "email" ||
+      key === "phone_no" ||
+      key === "first_name" ||
+      key === "last_name"
+    ) {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }

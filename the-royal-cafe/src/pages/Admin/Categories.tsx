@@ -55,6 +55,7 @@ const Categories = () => {
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
+    totalItems: 0,
   });
   /* ================= FETCH ITEMS ================= */
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -69,6 +70,7 @@ const Categories = () => {
         setPagination({
           page: res.page,
           totalPages: res.totalPages,
+          totalItems: res.total,
         });
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
@@ -95,8 +97,6 @@ const Categories = () => {
     page: 1,
     limit: 5,
     name: "",
-    category: "",
-    is_special: "",
   };
   /* ================= FILTER ================= */
   const handleFilterChange = (values: Record<string, unknown>) => {
@@ -236,6 +236,8 @@ const Categories = () => {
         <Pagination
           page={pagination.page}
           totalPages={pagination.totalPages}
+          limit={filters.limit}
+          totalItems={pagination.totalItems}
           onPageChange={handlePageChange}
         />
         <AddButton
