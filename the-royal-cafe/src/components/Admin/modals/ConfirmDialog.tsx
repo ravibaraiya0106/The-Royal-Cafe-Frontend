@@ -16,8 +16,8 @@ type Props = {
 
 const ConfirmDialog = ({
   open,
-  title = "Delete Item",
-  message = "Are you sure you want to delete this item?",
+  title = "Confirm Action",
+  message = "Are you sure you want to perform this action?",
   onClose,
   onConfirm,
   loading = false,
@@ -31,7 +31,7 @@ const ConfirmDialog = ({
           elevation={0}
           sx={{
             p: 4,
-            borderRadius: "20px",
+            borderRadius: "5px",
             border: "1px solid #e5e7eb",
             textAlign: "center",
           }}

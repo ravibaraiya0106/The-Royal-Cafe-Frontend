@@ -18,8 +18,8 @@ export const categoriesList = async (params?: Record<string, unknown>) => {
 };
 
 /* ================= GET BY ID ================= */
-export const getItemById = async (id: string) => {
-  const res = await getRequest(ENDPOINTS.ITEMS.GET_BY_ID(id));
+export const getCategoryById = async (id: string) => {
+  const res = await getRequest(ENDPOINTS.CATEGORIES.GET_BY_ID(id));
 
   const { success, message, responseData } = res.data;
 
@@ -29,8 +29,8 @@ export const getItemById = async (id: string) => {
 };
 
 /* ================= CREATE ================= */
-export const createItem = async (formData: FormData) => {
-  const res = await postRequest(ENDPOINTS.ITEMS.CREATE, formData, true);
+export const createCategory = async (formData: FormData) => {
+  const res = await postRequest(ENDPOINTS.CATEGORIES.CREATE, formData, true);
 
   const { success, message } = res.data;
 
@@ -39,8 +39,8 @@ export const createItem = async (formData: FormData) => {
 };
 
 /* ================= UPDATE ================= */
-export const updateItem = async (id: string, formData: FormData) => {
-  const res = await putRequest(ENDPOINTS.ITEMS.UPDATE(id), formData, true);
+export const updateCategory = async (id: string, formData: FormData) => {
+  const res = await putRequest(ENDPOINTS.CATEGORIES.UPDATE(id), formData, true);
 
   const { success, message } = res.data;
 
@@ -49,21 +49,11 @@ export const updateItem = async (id: string, formData: FormData) => {
 };
 
 /* ================= DELETE ================= */
-export const deleteItem = async (id: string) => {
-  const res = await deleteRequest(ENDPOINTS.ITEMS.DELETE(id));
+export const deleteCategory = async (id: string) => {
+  const res = await deleteRequest(ENDPOINTS.CATEGORIES.DELETE(id));
 
   const { success, message } = res.data;
 
   if (!success) throw new Error(message);
   return message;
-};
-
-/* ================= CATEGORY DROPDOWN ================= */
-export const getCategoryDropdown = async () => {
-  const res = await getRequest(ENDPOINTS.ITEMS.CATEGORY_DROPDOWN);
-  const { success, message, responseData } = res.data;
-
-  if (!success) throw new Error(message);
-
-  return responseData;
 };

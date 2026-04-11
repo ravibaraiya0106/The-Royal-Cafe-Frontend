@@ -57,7 +57,7 @@ const Items = () => {
 
   const [filters, setFilters] = useState({
     page: 1,
-    limit: 1,
+    limit: 5,
     name: "",
     category: "",
     is_special: "",
@@ -65,6 +65,7 @@ const Items = () => {
   const [pagination, setPagination] = useState({
     page: 1,
     totalPages: 1,
+    totalItems: 0,
   });
   /* ================= FETCH ITEMS ================= */
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -79,6 +80,7 @@ const Items = () => {
         setPagination({
           page: res.page,
           totalPages: res.totalPages,
+          totalItems: res.total,
         });
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
@@ -124,7 +126,7 @@ const Items = () => {
 
   const defaultFilters = {
     page: 1,
-    limit: 10,
+    limit: 5,
     name: "",
     category: "",
     is_special: "",
@@ -308,6 +310,8 @@ const Items = () => {
         <Pagination
           page={pagination.page}
           totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          limit={filters.limit}
           onPageChange={handlePageChange}
         />
         <AddButton
@@ -353,6 +357,8 @@ const Items = () => {
       </div>
 
       <ConfirmDialog
+        title="Delete Item"
+        message="Are you sure you want to delete this item?"
         open={deleteOpen}
         onClose={() => setDeleteOpen(false)}
         onConfirm={handleDelete}

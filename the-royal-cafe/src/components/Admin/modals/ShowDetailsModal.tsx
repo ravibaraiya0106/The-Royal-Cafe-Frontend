@@ -35,7 +35,7 @@ const ShowDetailsModal = ({
             maxHeight: "85vh",
             display: "flex",
             flexDirection: "column",
-            borderRadius: "20px",
+            borderRadius: "5px",
             border: "1px solid #e5e7eb",
             overflow: "hidden", //  important
           }}

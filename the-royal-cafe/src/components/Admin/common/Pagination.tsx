@@ -4,31 +4,48 @@ import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 type Props = {
   page: number;
   totalPages: number;
+  totalItems: number;
+  limit: number;
   onPageChange: (page: number) => void;
 };
 
-const Pagination = ({ page, totalPages, onPageChange }: Props) => {
-  if (totalPages <= 1) return null;
+const Pagination = ({
+  page,
+  totalPages,
+  totalItems,
+  limit,
+  onPageChange,
+}: Props) => {
+  // hide if no data
+  if (!totalItems) return null;
 
   const generatePages = () => {
-    const pages = [];
-
+    const pages: number[] = [];
     for (let i = 1; i <= totalPages; i++) {
       pages.push(i);
     }
-
     return pages;
   };
 
+  const startItem = (page - 1) * limit + 1;
+  const endItem = Math.min(page * limit, totalItems);
+
   return (
-    <div className="flex items-center justify-between mt-6 bg-white rounded-[5px] shadow-sm border border-gray-200 p-1 px-4">
-      {/* LEFT INFO */}
+    <div className="flex items-center justify-between mt-6 bg-white rounded-[5px] shadow-sm border border-gray-200 p-2 px-4">
+      {/* LEFT */}
       <div className="text-sm text-gray-500">
         Page <span className="font-semibold text-brand">{page}</span> of{" "}
         <span className="font-semibold">{totalPages}</span>
       </div>
 
-      {/* PAGINATION */}
+      {/* CENTER */}
+      <div className="text-sm text-gray-600">
+        Showing <span className="font-semibold text-brand">{startItem}</span> –{" "}
+        <span className="font-semibold text-brand">{endItem}</span> of{" "}
+        <span className="font-semibold">{totalItems}</span> items
+      </div>
+
+      {/* RIGHT */}
       <div className="flex items-center gap-2">
         {/* PREV */}
         <button

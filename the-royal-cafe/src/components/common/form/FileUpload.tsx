@@ -19,7 +19,7 @@ const FileUpload = ({ file, onChange, error }: Props) => {
 
         <input
           type="file"
-          accept="image/*"
+          accept=".png,.jpg,.jpeg"
           onChange={onChange}
           className="hidden"
         />
