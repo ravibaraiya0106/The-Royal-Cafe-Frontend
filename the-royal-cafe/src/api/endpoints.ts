@@ -26,6 +26,7 @@ export const ENDPOINTS = {
     GET_ALL: "/contact/list",
     GET_BY_ID: (id: string) => `/contact/${id}`,
     DELETE: (id: string) => `/contact/delete/${id}`,
+    REPLY: (id: string) => `/contact/reply/${id}`,
   },
   REVIEWS: {
     GET_ALL: "/review/list",

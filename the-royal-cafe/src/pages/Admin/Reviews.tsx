@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
-import { FiTrash, FiEye } from "react-icons/fi";
+import { FiTrash, FiEye, FiStar } from "react-icons/fi";
 import AdminLayout from "@/Layouts/AdminLayout";
 import { reviewsList, deleteReview } from "@/services/reviewsService";
 import { toastSuccess, toastError } from "@/utils/toast";
@@ -140,7 +140,26 @@ const Reviews = () => {
       setDeleteLoading(false);
     }
   };
+  const getRatingUI = (rating?: number) => {
+    if (!rating) return "-";
 
+    return (
+      <div className="flex items-center gap-1">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <FiStar
+            key={star}
+            size={14}
+            className={
+              star <= rating
+                ? "text-yellow-500 fill-yellow-400"
+                : "text-gray-300"
+            }
+          />
+        ))}
+        <span className="text-xs text-gray-500 ml-1">({rating})</span>
+      </div>
+    );
+  };
   /* ================= FILTER FIELDS ================= */
   const filterFields: FilterField[] = [
     { key: "username", label: "Search Username", type: "text" },
@@ -171,7 +190,11 @@ const Reviews = () => {
       accessor: "product",
       render: (row) => row.product?.name || "-",
     },
-    { header: "Rating", accessor: "rating" },
+    {
+      header: "Rating",
+      accessor: "rating",
+      render: (row) => getRatingUI(row.rating),
+    },
     { header: "Comment", accessor: "comment" },
 
     {
@@ -232,7 +255,10 @@ const Reviews = () => {
         fields={[
           { label: "Username", value: viewData?.user?.username },
           { label: "Product", value: viewData?.product?.name },
-          { label: "Rating", value: viewData?.rating },
+          {
+            label: "Rating",
+            render: () => getRatingUI(viewData?.rating),
+          },
           { label: "Comment", value: viewData?.comment },
         ]}
       />

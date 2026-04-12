@@ -175,7 +175,7 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
         <Paper
           elevation={0}
           sx={{
-            minHeight: "75vh",
+            minHeight: "70vh",
             display: "flex",
             flexDirection: "column",
             borderRadius: "5px",

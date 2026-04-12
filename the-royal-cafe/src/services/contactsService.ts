@@ -1,4 +1,4 @@
-import { deleteRequest, getRequest } from "./apiService";
+import { deleteRequest, getRequest, putRequest } from "./apiService";
 import { ENDPOINTS } from "@/api/endpoints";
 
 /* ================= GET ALL ================= */
@@ -26,6 +26,16 @@ export const getContactById = async (id: string) => {
 /* ================= DELETE ================= */
 export const deleteContact = async (id: string) => {
   const res = await deleteRequest(ENDPOINTS.CONTACTS.DELETE(id));
+
+  const { success, message } = res.data;
+
+  if (!success) throw new Error(message);
+  return message;
+};
+
+/* ================= REPLY ================= */
+export const replyContact = async (id: string, formData: FormData) => {
+  const res = await putRequest(ENDPOINTS.CONTACTS.REPLY(id), formData, true);
 
   const { success, message } = res.data;
 

@@ -46,7 +46,7 @@ const Register = () => {
 
           {/* Glass Card */}
           <div className="mt-10 bg-white/10 backdrop-blur-lg px-6 py-4 rounded-2xl border border-white/20 inline-block">
-            <p className="text-sm opacity-80">🔥 Today’s Special</p>
+            <p className="text-sm opacity-80"> Today’s Special</p>
             <p className="font-semibold text-lg">Cappuccino + Croissant</p>
           </div>
         </div>

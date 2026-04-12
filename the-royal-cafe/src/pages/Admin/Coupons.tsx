@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
-import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye, FiPercent, FiTag } from "react-icons/fi";
 import AdminLayout from "@/Layouts/AdminLayout";
 import AddButton from "../../components/Admin/common/AddButton";
 import AddEditCouponModal from "../../components/Admin/modals/AddEditCouponModal";
@@ -168,6 +168,32 @@ const Coupons = () => {
     }
   };
 
+  const getDiscountTypeUI = (type?: string) => {
+    const value = type?.toLowerCase();
+
+    let icon;
+    let style = "";
+    let label = "";
+
+    if (value === "percentage") {
+      icon = <FiPercent size={14} />;
+      style = "bg-blue-100 text-blue-700";
+      label = "Percentage";
+    } else if (value === "flat") {
+      icon = <FiTag size={14} />; // better than $
+      style = "bg-green-100 text-green-700";
+      label = "Flat";
+    }
+
+    return (
+      <div
+        className={`flex items-center justify-center gap-2 px-3 py-1 rounded-full text-xs font-medium w-fit ${style}`}
+      >
+        {icon}
+        <span>{label}</span>
+      </div>
+    );
+  };
   /* ================= FILTER FIELDS ================= */
   const filterFields: FilterField[] = [
     { key: "code", label: "Search Code", type: "text" },
@@ -197,8 +223,13 @@ const Coupons = () => {
         </span>
       ),
     },
-    { header: "Discount Type", accessor: "discount_type" },
-    { header: "Discount Value", accessor: "discount_value" },
+    {
+      header: "Discount Type",
+      accessor: "discount_type",
+      align: "center",
+      render: (row) => getDiscountTypeUI(row.discount_type),
+    },
+    { header: "Discount Value", accessor: "discount_value", align: "center" },
     {
       header: "Expiry Date",
       accessor: "expiry_date",
@@ -310,7 +341,10 @@ const Coupons = () => {
         fields={[
           { label: "Code", value: viewData?.code },
           { label: "Description", value: viewData?.description },
-          { label: "Discount Type", value: viewData?.discount_type },
+          {
+            label: "Discount Type",
+            render: () => getDiscountTypeUI(viewData?.discount_type),
+          },
           { label: "Discount Value", value: viewData?.discount_value },
           { label: "Min Order Amount", value: viewData?.min_order_amount },
           { label: "Max Discount", value: viewData?.max_discount },
