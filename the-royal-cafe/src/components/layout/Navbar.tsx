@@ -21,8 +21,8 @@ const Navbar = () => {
     () => [
       { label: "Home", to: "/" },
       { label: "About", to: "/about" },
-      { label: "Items", to: "/item" },
-      { label: "Blog", to: "/blog" },
+      { label: "Items", to: "/items" },
+      { label: "Blogs", to: "/blogs" },
       { label: "Contact", to: "/contact" },
     ],
     [],

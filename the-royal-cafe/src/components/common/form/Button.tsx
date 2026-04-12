@@ -147,3 +147,63 @@ export const SmallButton = ({ label, onClick }: BaseProps) => {
     </Button>
   );
 };
+/* ================= ROUND BUTTON ================= */
+type RoundButtonProps = {
+  icon: ReactNode;
+  onClick?: () => void;
+  variant?: "primary" | "secondary";
+  size?: number;
+  disabled?: boolean;
+};
+
+export const RoundButton = ({
+  icon,
+  onClick,
+  variant = "primary",
+  size = 36,
+  disabled = false,
+}: RoundButtonProps) => {
+  return (
+    <IconButton
+      onClick={onClick}
+      disabled={disabled}
+      type="button"
+      sx={{
+        width: size,
+        height: size,
+        borderRadius: "50%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        transition: "all 0.2s ease",
+
+        ...(variant === "primary"
+          ? {
+              background: "linear-gradient(135deg, #6b0f0f, #8b1a1a)",
+              color: "#fff",
+              boxShadow: "0 4px 14px rgba(107,15,15,0.4)",
+              "&:hover": {
+                background: "linear-gradient(135deg, #500b0b, #6b0f0f)",
+                transform: "scale(1.05)", // 🔥 nice effect
+              },
+            }
+          : {
+              backgroundColor: "#f9fafb",
+              color: "#374151",
+              border: "1px solid #e5e7eb",
+              "&:hover": {
+                backgroundColor: "#f3f4f6",
+                transform: "scale(1.05)",
+              },
+            }),
+
+        ...(disabled && {
+          opacity: 0.5,
+          cursor: "not-allowed",
+        }),
+      }}
+    >
+      {icon}
+    </IconButton>
+  );
+};

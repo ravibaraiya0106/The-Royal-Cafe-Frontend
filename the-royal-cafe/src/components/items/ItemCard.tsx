@@ -1,60 +1,86 @@
 import { useState } from "react";
+import SpecialBadge from "../common/badge/SpecialBadge";
+import Badge from "../common/badge/Badge";
+import { FiLayers, FiMinus, FiPlus } from "react-icons/fi";
+import { PrimaryButton, RoundButton } from "../common/form/Button";
 
 type Item = {
   id: number;
   name: string;
+  description?: string;
   image: string;
+  is_special?: boolean;
+  category?: { id: number; name: string } | string;
 };
 
 const ItemCard = ({ item }: { item: Item }) => {
   const [count, setCount] = useState(0);
 
+  const categoryName =
+    typeof item.category === "string" ? item.category : item.category?.name;
+
   return (
-    <div className="bg-white max-w-sm border border-gray-200 rounded-xl shadow-sm overflow-hidden">
-      {/* Image */}
+    <div className="bg-white max-w-sm border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md transition">
+      {/* IMAGE */}
       <img
         className="w-full h-48 object-cover"
         src={item.image}
         alt={item.name}
       />
 
-      {/* Content */}
+      {/* CONTENT */}
       <div className="p-5 text-center">
-        {/* Tag */}
-        <span className="inline-flex items-center bg-brand/10 border border-brand/20 text-brand text-xs font-medium px-2 py-1 rounded-md">
-          ☕ Popular
-        </span>
+        {/* CATEGORY BADGE */}
+        {categoryName && (
+          <div className="flex justify-center mb-2">
+            <Badge
+              label={categoryName}
+              icon={<FiLayers size={12} />}
+              variant="primary"
+            />
+          </div>
+        )}
 
-        {/* Title */}
-        <h5 className="mt-3 mb-4 text-xl font-semibold text-gray-800">
+        {/* SPECIAL BADGE */}
+        <div className="flex justify-center mb-2">
+          <SpecialBadge isSpecial={item.is_special} size="md" />
+        </div>
+
+        {/* TITLE */}
+        <h5 className="mt-2 mb-3 text-xl font-semibold text-gray-800">
           {item.name}
         </h5>
 
-        {/* Add to Cart */}
+        {/* DESCRIPTION */}
+        {item.description && (
+          <p className="text-gray-600 mb-4 text-sm line-clamp-2">
+            {item.description}
+          </p>
+        )}
+
+        {/* CART */}
+        {/* CART */}
         {count === 0 ? (
-          <button
+          <PrimaryButton
+            label="Add to Cart"
+            fullWidth={false}
             onClick={() => setCount(1)}
-            className="bg-brand text-white px-4 py-2 rounded-lg hover:bg-brand/90 transition"
-          >
-            Add to Cart
-          </button>
+          />
         ) : (
           <div className="flex items-center justify-center gap-4">
-            <button
+            <RoundButton
+              icon={<FiMinus size={16} />}
+              variant="secondary"
               onClick={() => setCount(count - 1)}
-              className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300"
-            >
-              -
-            </button>
+            />
 
             <span className="font-semibold text-lg">{count}</span>
 
-            <button
+            <RoundButton
+              icon={<FiPlus size={16} />}
+              variant="primary"
               onClick={() => setCount(count + 1)}
-              className="w-8 h-8 rounded-full bg-brand text-white hover:bg-brand/90"
-            >
-              +
-            </button>
+            />
           </div>
         )}
       </div>

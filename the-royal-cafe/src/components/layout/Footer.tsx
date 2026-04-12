@@ -14,8 +14,8 @@ import {
 const quickLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
-  { label: "Items", to: "/fooditem" },
-  { label: "Blog", to: "/blog" },
+  { label: "Items", to: "/items" },
+  { label: "Blogs", to: "/blogs" },
   { label: "Contact", to: "/contact" },
 ];
 

@@ -5,8 +5,9 @@ import type { NavItemType } from "@/types/common";
 export const ROUTES = {
   HOME: "/",
   ABOUT: "/about",
-  ITEMS: "/item",
-  BLOG: "/blog",
+  ITEMS: "/items",
+  BLOGS: "/blogs",
+  BLOG_DETAILS: "/blogs/:id",
   CONTACT: "/contact",
   FOOD_ITEM: "/fooditem",
   CART: "/cart",
@@ -20,14 +21,14 @@ export const NAV_ITEMS: NavItemType[] = [
   { label: "Home", to: ROUTES.HOME },
   { label: "About", to: ROUTES.ABOUT },
   { label: "Items", to: ROUTES.ITEMS },
-  { label: "Blog", to: ROUTES.BLOG },
+  { label: "Blogs", to: ROUTES.BLOGS },
   { label: "Contact", to: ROUTES.CONTACT },
 ];
 
 export const QUICK_LINKS: NavItemType[] = [
   { label: "Home", to: ROUTES.HOME },
   { label: "About", to: ROUTES.ABOUT },
-  { label: "Items", to: ROUTES.FOOD_ITEM },
-  { label: "Blog", to: ROUTES.BLOG },
+  { label: "Items", to: ROUTES.ITEMS },
+  { label: "Blogs", to: ROUTES.BLOGS },
   { label: "Contact", to: ROUTES.CONTACT },
 ];

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
-import { FiEdit, FiTrash, FiEye, FiAward } from "react-icons/fi";
+import { FiEdit, FiTrash, FiEye } from "react-icons/fi";
 import AdminLayout from "@/Layouts/AdminLayout";
 import AddButton from "../../components/Admin/common/AddButton";
 import AddEditItemModal from "../../components/Admin/modals/AddEditItemModal";
@@ -18,6 +18,7 @@ import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
 import Filter from "@/components/Admin/common/Filter";
 import ShowDetailsModal from "@/components/Admin/modals/ShowDetailsModal";
 import Pagination from "@/components/Admin/common/Pagination";
+import SpecialBadge from "@/components/common/badge/SpecialBadge";
 
 type Item = {
   _id: string;
@@ -246,23 +247,12 @@ const Items = () => {
         ),
     },
     {
-      header: "Special",
+      header: "Type",
       accessor: "is_special",
       align: "center",
       render: (row) => (
         <div className="flex justify-center">
-          <div
-            className={`p-1.5 rounded-lg ${
-              row.is_special
-                ? "bg-yellow-100 text-yellow-600"
-                : "bg-gray-100 text-gray-400"
-            }`}
-          >
-            <FiAward
-              size={16}
-              className={row.is_special ? "animate-pulse" : ""}
-            />
-          </div>
+          <SpecialBadge isSpecial={row.is_special} />
         </div>
       ),
     },
@@ -386,8 +376,10 @@ const Items = () => {
           },
           { label: "Description", value: viewData?.description },
           {
-            label: "Special",
-            value: viewData?.is_special ? "Yes" : "No",
+            label: "Type",
+            render: () => (
+              <SpecialBadge isSpecial={viewData?.is_special} size="md" />
+            ),
           },
         ]}
       />
