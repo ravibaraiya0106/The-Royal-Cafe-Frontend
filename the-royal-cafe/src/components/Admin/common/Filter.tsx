@@ -44,7 +44,9 @@ const Filter = ({ filters, onChange }: Props) => {
       key === "phone_no" ||
       key === "first_name" ||
       key === "last_name" ||
-      key === "code"
+      key === "code" ||
+      key === "phone" ||
+      key === "vehicle_number"
     ) {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);

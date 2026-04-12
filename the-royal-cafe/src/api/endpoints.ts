@@ -40,4 +40,11 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/coupon/update/${id}`,
     DELETE: (id: string) => `/coupon/delete/${id}`,
   },
+  DELIVERY_PERSON: {
+    GET_ALL: "/delivery-person/list",
+    GET_BY_ID: (id: string) => `/delivery-person/${id}`,
+    CREATE: "/delivery-person/create",
+    UPDATE: (id: string) => `/delivery-person/update/${id}`,
+    DELETE: (id: string) => `/delivery-person/delete/${id}`,
+  },
 };
