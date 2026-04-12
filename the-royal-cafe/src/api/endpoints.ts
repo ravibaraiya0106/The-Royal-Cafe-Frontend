@@ -32,4 +32,11 @@ export const ENDPOINTS = {
     GET_BY_ID: (id: string) => `/review/${id}`,
     DELETE: (id: string) => `/review/delete/${id}`,
   },
+  COUPONS: {
+    GET_ALL: "/coupon/list",
+    GET_BY_ID: (id: string) => `/coupon/${id}`,
+    CREATE: "/coupon/create",
+    UPDATE: (id: string) => `/coupon/update/${id}`,
+    DELETE: (id: string) => `/coupon/delete/${id}`,
+  },
 };

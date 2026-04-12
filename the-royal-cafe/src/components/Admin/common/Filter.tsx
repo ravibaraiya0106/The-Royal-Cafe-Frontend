@@ -3,6 +3,7 @@ import { useState, useRef } from "react";
 
 import InputField from "@/components/common/form/InputField";
 import SelectField from "@/components/common/form/SelectField";
+import DatePickerField from "@/components/common/form/DateField";
 import { PrimaryButton } from "@/components/common/form/Button";
 
 type Option = {
@@ -13,7 +14,7 @@ type Option = {
 type FilterField = {
   key: string;
   label: string;
-  type: "text" | "select";
+  type: "text" | "select" | "date";
   options?: Option[];
 };
 
@@ -42,7 +43,8 @@ const Filter = ({ filters, onChange }: Props) => {
       key === "email" ||
       key === "phone_no" ||
       key === "first_name" ||
-      key === "last_name"
+      key === "last_name" ||
+      key === "code"
     ) {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
@@ -50,16 +52,17 @@ const Filter = ({ filters, onChange }: Props) => {
 
       debounceRef.current = setTimeout(() => {
         onChange(updatedValues);
-      }, 1000); // 5 seconds
+      }, 500);
     } else {
       // Immediate for dropdowns
       onChange(updatedValues);
     }
   };
-  /* ================= RESET ================= */
+
+  /* ===== RESET ===== */
   const handleReset = () => {
     setValues({});
-    onChange({}); // important (reload full data)
+    onChange({});
   };
 
   return (
@@ -69,34 +72,40 @@ const Filter = ({ filters, onChange }: Props) => {
     >
       {filters.map((filter) => (
         <div key={filter.key} className="min-w-[200px] flex-1">
-          {/* TEXT INPUT */}
+          {/* TEXT */}
           {filter.type === "text" && (
             <InputField
               label={filter.label}
               name={filter.key}
               value={(values[filter.key] as string) || ""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange(filter.key, e.target.value)
-              }
+              onChange={(e) => handleChange(filter.key, e.target.value)}
             />
           )}
 
-          {/* SELECT INPUT */}
+          {/* SELECT */}
           {filter.type === "select" && (
             <SelectField
               label={filter.label}
               name={filter.key}
               value={(values[filter.key] as string) || ""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                handleChange(filter.key, e.target.value)
-              }
+              onChange={(e) => handleChange(filter.key, e.target.value)}
               options={[{ label: "All", value: "" }, ...(filter.options || [])]}
+            />
+          )}
+
+          {/* DATE PICKER  */}
+          {filter.type === "date" && (
+            <DatePickerField
+              label={filter.label}
+              name={filter.key}
+              value={(values[filter.key] as string) || ""}
+              onChange={handleChange}
             />
           )}
         </div>
       ))}
 
-      {/* RIGHT SIDE BUTTON */}
+      {/* RESET */}
       <div className="flex justify-end pb-1">
         <PrimaryButton onClick={handleReset} label="Reset" />
       </div>
