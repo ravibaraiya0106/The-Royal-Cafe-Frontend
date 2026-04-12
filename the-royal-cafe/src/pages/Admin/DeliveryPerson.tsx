@@ -13,7 +13,7 @@ import {
   updateDeliveryPerson,
   createDeliveryPerson,
   getDeliveryPersonById,
-} from "@/services/deliveryPersonService";
+} from "@/services/deliveryPersonsService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
 import Filter from "@/components/Admin/common/Filter";

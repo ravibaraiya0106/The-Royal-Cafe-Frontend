@@ -6,15 +6,16 @@ type Props = {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string; // added
+  row?: number; // added
 };
 
-const TextAreaField = ({ label, name, value, onChange, error }: Props) => {
+const TextAreaField = ({ label, name, value, onChange, error, row }: Props) => {
   return (
     <TextField
       fullWidth
       size="small"
       multiline
-      rows={3}
+      rows={row || 3}
       label={label}
       name={name}
       value={value}
