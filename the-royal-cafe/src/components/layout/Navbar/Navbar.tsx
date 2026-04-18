@@ -4,16 +4,29 @@ import type { NavItemType } from "@/types/common";
 import logo from "@/assets/images/logo.png";
 import { Link } from "react-router-dom";
 import type { RefObject } from "react";
+
 import CartButton from "./CartButton.tsx";
 import DesktopNav from "./DesktopNav.tsx";
 import MobileNav from "./MobileNav.tsx";
 import ProfileMenu from "./ProfileMenu.tsx";
+
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { user, PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
+
+import { PrimaryButton } from "@/components/common/form/Button.tsx";
+
+// MODALS
+import LoginModal from "@/components/auth/LoginModal.tsx";
+import RegisterModal from "@/components/auth/RegisterModal.tsx";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+
+  // AUTH MODAL STATE
+  const [loginOpen, setLoginOpen] = useState(false);
+  const [registerOpen, setRegisterOpen] = useState(false);
+
   const profileMenuId = useId();
   const profileButtonRef = useRef<HTMLButtonElement | null>(null);
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
@@ -25,6 +38,7 @@ const Navbar = () => {
     [],
   );
 
+  /* ================= ESC + CLICK ================= */
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
@@ -67,90 +81,100 @@ const Navbar = () => {
   );
 
   return (
-    <nav className="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200 relative">
-      {/* Keep fixed height so the `h-16` spacer in App.tsx always matches */}
-      <div className="max-w-screen-xl mx-auto h-16 px-4 flex items-center justify-between flex-nowrap">
-        {/* Logo */}
-        <Link
-          to="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-          onClick={() => {
-            setMenuOpen(false);
-            setProfileOpen(false);
-          }}
-        >
-          <img
-            src={logo}
-            className="h-11 object-contain"
-            alt="The Royal Cafe Logo"
-          />
-        </Link>
-
-        {/* Right side */}
-        <div className="flex items-center md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse flex-nowrap">
-          <CartButton cartCount={3} />
-
-          <ProfileMenu
-            open={profileOpen}
-            setOpen={setProfileOpen}
-            profileMenuId={profileMenuId}
-            profileButtonRef={profileButtonRef}
-            profileMenuRef={profileMenuRef}
-            user={user}
-            items={PROFILE_MENU_ITEMS}
-          />
-
-          {/* Mobile menu toggle */}
-          <button
-            ref={menuButtonRef}
-            data-collapse-toggle="navbar-user"
-            type="button"
-            className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-700 rounded-xl md:hidden hover:bg-gray-100 hover:text-brand focus:outline-none focus:ring-2 focus:ring-gray-200"
-            aria-controls="navbar-user"
-            aria-expanded={menuOpen}
-            onClick={() => setMenuOpen((v) => !v)}
+    <>
+      <nav className="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200 relative">
+        <div className="max-w-screen-xl mx-auto h-16 px-4 flex items-center justify-between flex-nowrap">
+          {/* LOGO */}
+          <Link
+            to="/"
+            className="flex items-center space-x-3"
+            onClick={() => {
+              setMenuOpen(false);
+              setProfileOpen(false);
+            }}
           >
-            <span className="sr-only">Open main menu</span>
-            <svg
-              className="w-6 h-6"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              fill="none"
-              viewBox="0 0 24 24"
+            <img src={logo} className="h-11 object-contain" />
+          </Link>
+
+          {/* RIGHT SIDE */}
+          <div className="flex items-center md:order-2 space-x-3 flex-nowrap">
+            <CartButton cartCount={3} />
+
+            {/* LOGIN BUTTON */}
+            <PrimaryButton label="Login" onClick={() => setLoginOpen(true)} />
+
+            <ProfileMenu
+              open={profileOpen}
+              setOpen={setProfileOpen}
+              profileMenuId={profileMenuId}
+              profileButtonRef={profileButtonRef}
+              profileMenuRef={profileMenuRef}
+              user={user}
+              items={PROFILE_MENU_ITEMS}
+            />
+
+            {/* MOBILE MENU BUTTON */}
+            <button
+              ref={menuButtonRef}
+              type="button"
+              className="inline-flex items-center p-2 w-10 h-10 justify-center text-sm text-gray-700 rounded-xl md:hidden hover:bg-gray-100 hover:text-brand"
+              onClick={() => setMenuOpen((v) => !v)}
             >
-              <path
-                className="stroke-brand"
-                strokeLinecap="round"
-                strokeWidth="2"
-                d="M5 7h14M5 12h14M5 17h14"
-              />
-            </svg>
-          </button>
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
+                <path
+                  className="stroke-brand"
+                  strokeLinecap="round"
+                  strokeWidth="2"
+                  d="M5 7h14M5 12h14M5 17h14"
+                />
+              </svg>
+            </button>
+          </div>
+
+          {/* DESKTOP NAV */}
+          <DesktopNav
+            navItems={navItems}
+            onNavigate={() => {
+              setMenuOpen(false);
+              setProfileOpen(false);
+            }}
+          />
+
+          {/* MOBILE NAV */}
+          <MobileNav
+            open={menuOpen}
+            navItems={navItems}
+            menuRef={menuRef}
+            onNavigate={() => {
+              setMenuOpen(false);
+              setProfileOpen(false);
+            }}
+          />
         </div>
+      </nav>
 
-        {/* Desktop menu */}
-        <DesktopNav
-          navItems={navItems}
-          onNavigate={() => {
-            setMenuOpen(false);
-            setProfileOpen(false);
-          }}
-        />
+      {/* ================= MODALS ================= */}
 
-        {/* Mobile menu */}
-        <MobileNav
-          open={menuOpen}
-          navItems={navItems}
-          menuRef={menuRef}
-          onNavigate={() => {
-            setMenuOpen(false);
-            setProfileOpen(false);
-          }}
-        />
-      </div>
-    </nav>
+      {/* LOGIN MODAL */}
+      <LoginModal
+        open={loginOpen}
+        onClose={() => setLoginOpen(false)}
+        onSwitchToRegister={() => {
+          setLoginOpen(false);
+          setRegisterOpen(true);
+        }}
+      />
+
+      {/* REGISTER MODAL */}
+      <RegisterModal
+        open={registerOpen}
+        onClose={() => setRegisterOpen(false)}
+        onSwitchToLogin={() => {
+          setRegisterOpen(false);
+          setLoginOpen(true);
+        }}
+      />
+    </>
   );
 };
 

@@ -25,7 +25,12 @@ type Props = {
   initialData?: CategoryData | null;
 };
 
-const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
+const AddEdiCategoryModal = ({
+  open,
+  onClose,
+  onSubmit,
+  initialData,
+}: Props) => {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -218,4 +223,4 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
   );
 };
 
-export default AddEditItemModal;
+export default AddEdiCategoryModal;

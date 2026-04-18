@@ -25,7 +25,7 @@ type Props = {
   initialData?: BlogData | null;
 };
 
-const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
+const AddEditBlogModal = ({ open, onClose, onSubmit, initialData }: Props) => {
   const [loading, setLoading] = useState(false);
 
   const [form, setForm] = useState({
@@ -136,7 +136,7 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
           {/* ================= HEADER ================= */}
           <div className="flex items-center justify-between px-4 py-3 border-b">
             <Typography variant="h6" sx={{ fontWeight: 600 }}>
-              {initialData ? "Edit Item" : "Add New Item"}
+              {initialData ? "Edit Blog" : "Add New Blog"}
             </Typography>
 
             <IconButton onClick={onClose} size="small">
@@ -217,4 +217,4 @@ const AddEditItemModal = ({ open, onClose, onSubmit, initialData }: Props) => {
   );
 };
 
-export default AddEditItemModal;
+export default AddEditBlogModal;

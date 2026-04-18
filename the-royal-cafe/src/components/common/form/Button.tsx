@@ -9,6 +9,7 @@ type BaseProps = {
   onClick?: () => void;
   fullWidth?: boolean;
   icon?: ReactNode;
+  size?: "small" | "medium" | "large";
 };
 
 /* 🔴 PRIMARY (Brand) */
@@ -18,9 +19,11 @@ export const PrimaryButton = ({
   onClick,
   fullWidth = true,
   icon,
+  size = "medium",
 }: BaseProps) => {
   return (
     <Button
+      size={size}
       fullWidth={fullWidth}
       variant="contained"
       onClick={onClick}
@@ -48,9 +51,11 @@ export const SecondaryButton = ({
   label,
   onClick,
   fullWidth = true,
+  size = "medium",
 }: BaseProps) => {
   return (
     <Button
+      size={size}
       fullWidth={fullWidth}
       variant="outlined"
       onClick={onClick}
@@ -77,9 +82,11 @@ export const DangerButton = ({
   label,
   onClick,
   fullWidth = true,
+  size = "medium",
 }: BaseProps) => {
   return (
     <Button
+      size={size}
       fullWidth={fullWidth}
       variant="contained"
       onClick={onClick}
@@ -184,7 +191,7 @@ export const RoundButton = ({
               boxShadow: "0 4px 14px rgba(107,15,15,0.4)",
               "&:hover": {
                 background: "linear-gradient(135deg, #500b0b, #6b0f0f)",
-                transform: "scale(1.05)", // 🔥 nice effect
+                transform: "scale(1.05)", // nice effect
               },
             }
           : {

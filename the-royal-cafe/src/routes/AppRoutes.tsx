@@ -8,7 +8,6 @@ import BlogDetails from "@/pages/blogs/BlogDetails";
 import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
 import Login from "@/components/auth/Login";
-import Register from "@/components/auth/Register";
 import { ROUTES } from "@/constants/Navigation";
 
 const AppRoutes = () => {
@@ -17,7 +16,6 @@ const AppRoutes = () => {
       <Routes>
         {/*  Auth routes */}
         <Route path={ROUTES.LOGIN} element={<Login />} />
-        <Route path={ROUTES.REGISTER} element={<Register />} />
         {/*  Pages */}
         <Route path={ROUTES.HOME} element={<Home />} />
         <Route path={ROUTES.ABOUT} element={<About />} />
