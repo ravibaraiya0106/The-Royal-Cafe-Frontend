@@ -1,4 +1,6 @@
-import { TextField } from "@mui/material";
+import { useState } from "react";
+import { TextField, IconButton, InputAdornment } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 type Props = {
   label: string;
@@ -8,7 +10,6 @@ type Props = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   type?: string;
   error?: string;
-  InputProps?: unknown;
 };
 
 const InputField = ({
@@ -20,6 +21,10 @@ const InputField = ({
   error,
   size = "small",
 }: Props) => {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const isPassword = type === "password";
+
   return (
     <TextField
       fullWidth
@@ -27,12 +32,31 @@ const InputField = ({
       label={label}
       name={name}
       value={value}
-      type={type}
+      type={isPassword ? (showPassword ? "text" : "password") : type}
       onChange={onChange}
       margin="normal"
       error={!!error}
       helperText={error}
-      sx={{ "& .MuiOutlinedInput-root": { borderRadius: "5px" }, margin: 0 }}
+      sx={{
+        "& .MuiOutlinedInput-root": { borderRadius: "5px" },
+        margin: 0,
+      }}
+      InputProps={
+        isPassword
+          ? {
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }
+          : undefined
+      }
     />
   );
 };

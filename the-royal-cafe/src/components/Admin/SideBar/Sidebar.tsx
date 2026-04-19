@@ -9,6 +9,7 @@ import logo1 from "../../../assets/images/logo1.png";
 import { logout } from "../../../utils/storage"; // import
 import { toastSuccess } from "../../../utils/toast"; // import
 import { ROUTES } from "@/constants/Sidebar";
+import { logoutService } from "@/services/authService";
 
 const Sidebar = ({
   collapsed,
@@ -20,13 +21,20 @@ const Sidebar = ({
   const navigate = useNavigate();
 
   // LOGOUT FUNCTION
-  const handleLogout = () => {
-    logout(); // clear localStorage
-    toastSuccess("Logged out successfully");
+  const handleLogout = async () => {
+    try {
+      const message = await logoutService();
 
-    setTimeout(() => {
-      navigate(ROUTES.ADMIN_LOGIN, { replace: true });
-    }, 1000);
+      toastSuccess(message || "Logged out successfully");
+      setTimeout(() => {
+        navigate(ROUTES.ADMIN_LOGIN, { replace: true });
+      }, 1000);
+    } catch (error) {
+      console.error("Logout API failed", error);
+    } finally {
+      logout(); // clear local storage
+      window.dispatchEvent(new Event("authChanged"));
+    }
   };
 
   return (

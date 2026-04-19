@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  Paper,
-  Typography,
-  IconButton,
-  InputAdornment,
-  Box,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Paper, Typography, Box } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 import logo from "../../assets/images/logo.png";
@@ -16,9 +9,10 @@ import { toastSuccess, toastError } from "../../utils/toast";
 
 import InputField from "@/components/common/form/InputField";
 import { PrimaryButton } from "@/components/common/form/Button";
+import { ROUTES } from "@/constants/Sidebar";
 
 const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
+  const [showPassword] = useState(false);
 
   const [form, setForm] = useState({
     username: "",
@@ -28,7 +22,7 @@ const Login = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate();   
 
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,7 +73,7 @@ const Login = () => {
         "Welcome back, " + user.first_name + " " + user.last_name + "!",
       );
 
-      navigate("/admin/dashboard");
+      navigate(ROUTES.ADMIN_DASHBOARD);
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -125,17 +119,6 @@ const Login = () => {
               value={form.password}
               onChange={handleChange}
               error={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
             />
           </Box>
 

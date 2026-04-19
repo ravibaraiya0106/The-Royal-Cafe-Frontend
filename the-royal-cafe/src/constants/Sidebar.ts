@@ -14,6 +14,7 @@ import {
 
 export const ROUTES = {
   // Admin Routes
+  ADMIN: "/admin/login",
   ADMIN_LOGIN: "/admin/login",
   ADMIN_DASHBOARD: "/admin/dashboard",
   ADMIN_ITEMS: "/admin/items",
@@ -85,7 +86,7 @@ export const SIDEBAR_ITEMS = [
     icon: FiTag,
   },
   {
-    label: "Contact",
+    label: "Contacts",
     to: ROUTES.ADMIN_CONTACT,
     icon: FiMessageSquare,
   },

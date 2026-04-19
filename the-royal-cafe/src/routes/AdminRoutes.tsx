@@ -9,6 +9,8 @@ export const AdminRoutes = (
   <>
     {/* Public */}
     <Route path={ROUTES.ADMIN_LOGIN} element={<Login />} />
+    <Route path={ROUTES.ADMIN} element={<Login />} />
+
 
     {/* Protected (Mapped) */}
     {ADMIN_ROUTE_CONFIG.map((route, index) => (

@@ -49,7 +49,7 @@ export const registerService = async (
   const res = await postRequest(ENDPOINTS.AUTH.REGISTER, data);
 
   // backend uses "data" instead of "responseData"
-  const { success, message, data: responseData } = res.data;
+  const { success, message, responseData } = res.data;
 
   if (!success) throw new Error(message);
 
@@ -60,12 +60,17 @@ export const registerService = async (
   };
 };
 
-export const logoutService = async () => {
+export const logoutService = async (): Promise<string | null> => {
   try {
     const res = await postRequest(ENDPOINTS.AUTH.LOGOUT);
-    return res.data?.message;
-  } catch {
-    // silently fail (backend down etc.)
+
+    const { success, message } = res.data;
+
+    if (!success) throw new Error(message);
+
+    return message;
+  } catch (err: unknown) {
+    console.error("Logout API failed", err);
     return null;
   }
 };

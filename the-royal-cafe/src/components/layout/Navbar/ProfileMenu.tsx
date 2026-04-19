@@ -42,7 +42,7 @@ const ProfileMenu = ({
         <div
           ref={profileMenuRef}
           id={profileMenuId}
-          className="absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg z-[9999]"
+          className="absolute right-0 mt-2 w-56 bg-white border rounded-sm shadow-lg z-[9999]"
         >
           {/* User Info */}
           <div className="px-4 py-3 border-b">

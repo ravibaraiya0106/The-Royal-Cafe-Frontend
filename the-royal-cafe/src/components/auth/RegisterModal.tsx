@@ -4,7 +4,6 @@ import { Paper, Typography, Box } from "@mui/material";
 import logo from "@/assets/images/logo.png";
 import { toastSuccess, toastError } from "@/utils/toast";
 import { registerService } from "@/services/authService";
-import { setAuth } from "@/utils/storage";
 
 import InputField from "@/components/common/form/InputField";
 import SelectField from "@/components/common/form/SelectField";
@@ -60,13 +59,12 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
     try {
       setLoading(true);
 
-      const { token, user } = (await registerService(form)) as {
-        token: string;
+      const { message, user } = (await registerService(form)) as {
+        message: string;
         user: {
           role: string;
           first_name: string;
           last_name: string;
-          [key: string]: unknown;
         };
       };
 
@@ -76,15 +74,12 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
         return;
       }
 
-      /* ================= AUTO LOGIN ================= */
-      setAuth(token, user);
+      /* ================= SUCCESS TOAST (API MESSAGE) ================= */
+      toastSuccess(message || "Registration successful! Please login");
 
-      /* ================= UPDATE NAVBAR ================= */
-      window.dispatchEvent(new Event("authChanged"));
-
-      toastSuccess("Registration successful!");
-
+      /* ================= SWITCH MODAL (NO DELAY NEEDED) ================= */
       onClose();
+      onSwitchToLogin?.();
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Registration failed");
     } finally {

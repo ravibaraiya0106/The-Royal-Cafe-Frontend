@@ -90,16 +90,15 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
       /* ================= SET AUTH ================= */
       setAuth(token, user);
 
-      /* ================= UPDATE NAVBAR ================= */
-      window.dispatchEvent(new Event("authChanged"));
-
       toastSuccess(
         "Welcome back, " + user.first_name + " " + user.last_name + "!",
       );
 
+      /* CLOSE MODAL */
       onClose();
 
-      window.location.reload();
+      /* UPDATE NAVBAR */
+      window.dispatchEvent(new Event("authChanged"));
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {

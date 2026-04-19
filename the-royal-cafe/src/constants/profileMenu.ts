@@ -11,12 +11,14 @@ export const user = {
 
 export const userLogout = async () => {
   try {
-    await logoutService();
+    const message = await logoutService();
+
+    toastSuccess(message || "Logged out successfully");
   } catch (error) {
     console.error("Logout API failed", error);
   } finally {
-    logout();
-    // window.dispatchEvent(new Event("authChanged"));
+    logout(); // clear local storage
+    window.dispatchEvent(new Event("authChanged"));
   }
 };
 
@@ -27,10 +29,6 @@ export const PROFILE_MENU_ITEMS: DropdownItem[] = [
     label: "Logout",
     onClick: async () => {
       await userLogout();
-
-      toastSuccess("Logged out successfully");
-
-      window.location.href = "/"; // or use navigate("/")
     },
   },
 ];

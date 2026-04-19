@@ -30,7 +30,4 @@ export const clearAuth = () => {
 /* ================= LOGOUT ================= */
 export const logout = () => {
   clearAuth();
-
-  // trigger UI update
-  window.dispatchEvent(new Event("authChanged"));
 };
