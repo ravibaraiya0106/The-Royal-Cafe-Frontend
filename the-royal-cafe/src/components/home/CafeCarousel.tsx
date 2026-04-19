@@ -7,7 +7,11 @@ const CafeCarousel = () => {
   }, []);
 
   return (
-    <div id="cafe-carousel" className="relative w-full" data-carousel="slide">
+    <div
+      id="cafe-carousel"
+      className="relative w-full z-0"
+      data-carousel="slide"
+    >
       {/* Carousel wrapper */}
       <div className="relative h-64 overflow-hidden md:h-[650px]">
         {/* Item 1 */}

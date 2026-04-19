@@ -32,11 +32,9 @@ const ProfileMenu = ({
         aria-controls={profileMenuId}
         onClick={() => setOpen((v) => !v)}
       >
-        <img
-          className="w-8 h-8 rounded-full"
-          src={user.avatar}
-          alt={user.name}
-        />
+        <div className="w-8 h-8 rounded-full bg-brand text-white flex items-center justify-center text-sm font-semibold">
+          {user.initials}
+        </div>
       </button>
 
       {/* Dropdown */}
@@ -44,7 +42,7 @@ const ProfileMenu = ({
         <div
           ref={profileMenuRef}
           id={profileMenuId}
-          className="absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg"
+          className="absolute right-0 mt-2 w-56 bg-white border rounded-xl shadow-lg z-[9999]"
         >
           {/* User Info */}
           <div className="px-4 py-3 border-b">

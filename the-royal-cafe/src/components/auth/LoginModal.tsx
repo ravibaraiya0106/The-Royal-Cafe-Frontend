@@ -35,7 +35,6 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -72,14 +71,35 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
     try {
       setLoading(true);
 
-      const { token, user } = await loginService(form);
+      const { token, user } = (await loginService(form)) as {
+        token: string;
+        user: {
+          role: string;
+          first_name: string;
+          last_name: string;
+          [key: string]: unknown;
+        };
+      };
+
+      /* ================= ROLE CHECK ================= */
+      if (user.role !== "user") {
+        toastError("Access denied. Admins must login from admin panel.");
+        return;
+      }
+
+      /* ================= SET AUTH ================= */
       setAuth(token, user);
+
+      /* ================= UPDATE NAVBAR ================= */
+      window.dispatchEvent(new Event("authChanged"));
 
       toastSuccess(
         "Welcome back, " + user.first_name + " " + user.last_name + "!",
       );
 
       onClose();
+
+      window.location.reload();
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -159,7 +179,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
             <span
               className="text-sm text-brand cursor-pointer hover:underline"
               onClick={() => {
-                onSwitchToRegister?.(); // ✅ only this
+                onSwitchToRegister?.(); // only this
               }}
             >
               Register

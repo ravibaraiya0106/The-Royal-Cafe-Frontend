@@ -1,4 +1,4 @@
-import Sidebar from "../components/Admin/SideBar/Sidebar";
+import Sidebar from "../components/Admin/sidebar/Sidebar";
 
 import { useState } from "react";
 

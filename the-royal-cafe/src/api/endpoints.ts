@@ -2,6 +2,7 @@ export const ENDPOINTS = {
   AUTH: {
     LOGIN: "/auth/login",
     REGISTER: "/auth/register",
+    LOGOUT: "/auth/logout",
   },
   ITEMS: {
     GET_ALL: "/product/list",

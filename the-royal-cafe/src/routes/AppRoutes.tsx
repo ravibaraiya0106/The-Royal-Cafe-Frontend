@@ -7,15 +7,12 @@ import Blog from "@/pages/blogs/Blogs";
 import BlogDetails from "@/pages/blogs/BlogDetails";
 import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
-import Login from "@/components/auth/Login";
 import { ROUTES } from "@/constants/Navigation";
 
 const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/*  Auth routes */}
-        <Route path={ROUTES.LOGIN} element={<Login />} />
         {/*  Pages */}
         <Route path={ROUTES.HOME} element={<Home />} />
         <Route path={ROUTES.ABOUT} element={<About />} />
@@ -27,7 +24,10 @@ const AppRoutes = () => {
 
         {AdminRoutes}
         {/*  Fallback */}
-        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        <Route
+          path="/admin/*"
+          element={<Navigate to={ROUTES.HOME} replace />}
+        />
       </Routes>
     </BrowserRouter>
   );

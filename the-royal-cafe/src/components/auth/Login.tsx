@@ -58,7 +58,15 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const { token, user } = await loginService(form);
+      const { token, user } = (await loginService(form)) as {
+        token: string;
+        user: {
+          role: string;
+          first_name: string;
+          last_name: string;
+          [key: string]: unknown;
+        };
+      };
 
       if (user.role !== "admin") {
         toastError("Access denied. Admin only.");

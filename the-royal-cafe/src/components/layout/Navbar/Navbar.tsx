@@ -11,13 +11,15 @@ import MobileNav from "./MobileNav.tsx";
 import ProfileMenu from "./ProfileMenu.tsx";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { user, PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
+import { PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
+import type { UserInfo } from "@/types/common";
 
 import { PrimaryButton } from "@/components/common/form/Button.tsx";
 
 // MODALS
 import LoginModal from "@/components/auth/LoginModal.tsx";
 import RegisterModal from "@/components/auth/RegisterModal.tsx";
+import { getUser } from "@/utils/storage";
 
 const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,6 +34,30 @@ const Navbar = () => {
   const profileMenuRef = useRef<HTMLDivElement | null>(null);
   const menuButtonRef = useRef<HTMLButtonElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+
+  const getInitialUser = (): UserInfo | null => {
+    const storedUser = getUser();
+    if (!storedUser) return null;
+
+    const name = `${storedUser.first_name} ${storedUser.last_name}`;
+    return {
+      name,
+      email: storedUser.email || "",
+      avatar: storedUser.avatar || "",
+      initials:
+        `${storedUser.first_name[0]}${storedUser.last_name[0]}`.toUpperCase(),
+    };
+  };
+
+  const [currentUser, setCurrentUser] = useState<UserInfo | null>(
+    getInitialUser,
+  );
+
+  useEffect(() => {
+    const updateUserInfo = () => setCurrentUser(getInitialUser());
+    window.addEventListener("authChanged", updateUserInfo);
+    return () => window.removeEventListener("authChanged", updateUserInfo);
+  }, []);
 
   const navItems = useMemo<NavItemType[]>(
     () => NAV_ITEMS.map((i) => ({ label: i.label, to: i.to })),
@@ -82,7 +108,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="bg-white fixed w-full z-20 top-0 start-0 border-b border-gray-200 relative">
+      <nav className="bg-white fixed w-full z-[9999] top-0 start-0 border-b border-gray-200 relative">
         <div className="max-w-screen-xl mx-auto h-16 px-4 flex items-center justify-between flex-nowrap">
           {/* LOGO */}
           <Link
@@ -100,18 +126,19 @@ const Navbar = () => {
           <div className="flex items-center md:order-2 space-x-3 flex-nowrap">
             <CartButton cartCount={3} />
 
-            {/* LOGIN BUTTON */}
-            <PrimaryButton label="Login" onClick={() => setLoginOpen(true)} />
-
-            <ProfileMenu
-              open={profileOpen}
-              setOpen={setProfileOpen}
-              profileMenuId={profileMenuId}
-              profileButtonRef={profileButtonRef}
-              profileMenuRef={profileMenuRef}
-              user={user}
-              items={PROFILE_MENU_ITEMS}
-            />
+            {!currentUser ? (
+              <PrimaryButton label="Login" onClick={() => setLoginOpen(true)} />
+            ) : (
+              <ProfileMenu
+                open={profileOpen}
+                setOpen={setProfileOpen}
+                profileMenuId={profileMenuId}
+                profileButtonRef={profileButtonRef}
+                profileMenuRef={profileMenuRef}
+                user={currentUser}
+                items={PROFILE_MENU_ITEMS}
+              />
+            )}
 
             {/* MOBILE MENU BUTTON */}
             <button

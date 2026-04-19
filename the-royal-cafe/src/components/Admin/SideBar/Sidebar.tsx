@@ -8,6 +8,7 @@ import logo1 from "../../../assets/images/logo1.png";
 
 import { logout } from "../../../utils/storage"; // import
 import { toastSuccess } from "../../../utils/toast"; // import
+import { ROUTES } from "@/constants/Sidebar";
 
 const Sidebar = ({
   collapsed,
@@ -24,7 +25,7 @@ const Sidebar = ({
     toastSuccess("Logged out successfully");
 
     setTimeout(() => {
-      navigate("/login");
+      navigate(ROUTES.ADMIN_LOGIN, { replace: true });
     }, 1000);
   };
 
