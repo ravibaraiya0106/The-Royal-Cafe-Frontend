@@ -29,6 +29,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
     gender: "male",
   });
 
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   if (!open) return null;
@@ -36,25 +37,65 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
   /* ================= HANDLE CHANGE ================= */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+
+    // clear error on typing
+    setErrors((prev) => ({
+      ...prev,
+      [e.target.name]: "",
+    }));
   };
 
   /* ================= VALIDATION ================= */
   const validate = () => {
-    if (!form.username.trim()) return "Username is required";
-    if (!form.first_name.trim()) return "First name is required";
-    if (!form.last_name.trim()) return "Last name is required";
-    if (!form.email.includes("@")) return "Invalid email";
-    if (form.phone_no.length < 10) return "Invalid phone number";
-    if (form.password.length < 6)
-      return "Password must be at least 6 characters";
+    const newErrors: Record<string, string> = {};
 
-    return null;
+    // USERNAME
+    if (!form.username.trim()) {
+      newErrors.username = "Username is required";
+    } else if (form.username.length < 3) {
+      newErrors.username = "Minimum 3 characters required";
+    }
+
+    // FIRST NAME
+    if (!form.first_name.trim()) {
+      newErrors.first_name = "First name is required";
+    }
+
+    // LAST NAME
+    if (!form.last_name.trim()) {
+      newErrors.last_name = "Last name is required";
+    }
+
+    // EMAIL
+    if (!form.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+      newErrors.email = "Invalid email format";
+    }
+
+    // PHONE
+    if (!form.phone_no.trim()) {
+      newErrors.phone_no = "Phone number is required";
+    } else if (!/^[0-9]{10}$/.test(form.phone_no)) {
+      newErrors.phone_no = "Phone must be 10 digits";
+    }
+
+    // PASSWORD
+    if (!form.password.trim()) {
+      newErrors.password = "Password is required";
+    } else if (form.password.length < 6) {
+      newErrors.password = "Minimum 6 characters required";
+    } else if (!/(?=.*[A-Z])(?=.*[0-9])/.test(form.password)) {
+      newErrors.password = "Must include at least 1 uppercase & 1 number";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   /* ================= SUBMIT ================= */
   const handleSubmit = async () => {
-    const error = validate();
-    if (error) return toastError(error);
+    if (!validate()) return;
 
     try {
       setLoading(true);
@@ -68,16 +109,13 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
         };
       };
 
-      /* ================= ROLE CHECK ================= */
       if (user.role !== "user") {
         toastError("Invalid role assigned");
         return;
       }
 
-      /* ================= SUCCESS TOAST (API MESSAGE) ================= */
       toastSuccess(message || "Registration successful! Please login");
 
-      /* ================= SWITCH MODAL (NO DELAY NEEDED) ================= */
       onClose();
       onSwitchToLogin?.();
     } catch (err: unknown) {
@@ -110,6 +148,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
               name="username"
               value={form.username}
               onChange={handleChange}
+              error={errors.username}
             />
 
             <InputField
@@ -117,6 +156,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
               name="first_name"
               value={form.first_name}
               onChange={handleChange}
+              error={errors.first_name}
             />
 
             <InputField
@@ -124,6 +164,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
               name="last_name"
               value={form.last_name}
               onChange={handleChange}
+              error={errors.last_name}
             />
 
             <InputField
@@ -131,6 +172,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
               name="email"
               value={form.email}
               onChange={handleChange}
+              error={errors.email}
             />
 
             <InputField
@@ -138,14 +180,16 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
               name="phone_no"
               value={form.phone_no}
               onChange={handleChange}
+              error={errors.phone_no}
             />
 
             <InputField
               label="Password"
               name="password"
+              type="password"
               value={form.password}
               onChange={handleChange}
-              type="password"
+              error={errors.password}
             />
 
             <Box>

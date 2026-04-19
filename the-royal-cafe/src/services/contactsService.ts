@@ -1,4 +1,9 @@
-import { deleteRequest, getRequest, putRequest } from "./apiService";
+import {
+  deleteRequest,
+  getRequest,
+  postRequest,
+  putRequest,
+} from "./apiService";
 import { ENDPOINTS } from "@/api/endpoints";
 
 /* ================= GET ALL ================= */
@@ -36,6 +41,16 @@ export const deleteContact = async (id: string) => {
 /* ================= REPLY ================= */
 export const replyContact = async (id: string, formData: FormData) => {
   const res = await putRequest(ENDPOINTS.CONTACTS.REPLY(id), formData, true);
+
+  const { success, message } = res.data;
+
+  if (!success) throw new Error(message);
+  return message;
+};
+
+/* ================= CREATE ================= */
+export const createContact = async (formData: FormData) => {
+  const res = await postRequest(ENDPOINTS.CONTACTS.CREATE, formData, true);
 
   const { success, message } = res.data;
 
