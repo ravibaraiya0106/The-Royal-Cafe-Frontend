@@ -8,6 +8,7 @@ import BlogDetails from "@/pages/blogs/BlogDetails";
 import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
 import { ROUTES } from "@/constants/Navigation";
+import UserProfile from "@/pages/user/UserProfile";
 
 const AppRoutes = () => {
   return (
@@ -21,6 +22,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.BLOGS} element={<Blog />} />
         <Route path={ROUTES.BLOG_DETAILS} element={<BlogDetails />} />
         <Route path={ROUTES.FOOD_ITEM} element={<Items />} />
+        <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
 
         {AdminRoutes}
         {/*  Fallback */}

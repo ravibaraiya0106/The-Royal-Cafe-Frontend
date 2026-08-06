@@ -14,6 +14,8 @@ export const ROUTES = {
   REGISTER: "/register",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
+  USER_PROFILE: "/profile",
+  ORDER_HISTORY: "/order-history",
 };
 
 export const NAV_ITEMS: NavItemType[] = [

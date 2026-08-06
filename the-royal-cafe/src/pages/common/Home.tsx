@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
 import Separator from "@/components/common/Seperator";
 import CafeCarousel from "@/components/home/CafeCarousel";
+import { ROUTES } from "@/constants/Navigation";
 
 const Home = () => {
   return (
@@ -29,17 +30,16 @@ const Home = () => {
               {/* Buttons */}
               <div className="mt-6 flex flex-wrap gap-4">
                 <Link
-                  to="/fooditem"
-                  className="bg-brand text-white px-6 py-3 rounded-xl shadow hover:opacity-90"
+                  to={ROUTES.ITEMS}
+                  onClick={() => {
+                    localStorage.setItem(
+                      "item_filter",
+                      JSON.stringify({ is_special: "true" }),
+                    );
+                  }}
+                  className="border border-brand text-brand px-6 py-3 rounded-[5px] shadow hover:bg-brand hover:text-white"
                 >
                   Order Now
-                </Link>
-
-                <Link
-                  to="/specialitem"
-                  className="border border-brand text-brand px-6 py-3 rounded-xl shadow hover:bg-brand hover:text-white"
-                >
-                  Order Our Special
                 </Link>
               </div>
             </div>

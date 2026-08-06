@@ -1,6 +1,7 @@
 // components/contact/ContactMapSection.tsx
 
 import { Link } from "react-router-dom";
+import { ROUTES } from "@/constants/Navigation";
 
 const ContactMapSection = () => {
   return (
@@ -19,7 +20,7 @@ const ContactMapSection = () => {
       </div>
 
       <Link
-        to="/"
+        to={ROUTES.ITEMS}
         className="inline-block mt-6 bg-brand text-white px-6 py-3 rounded-[5px]"
       >
         Explore Menu

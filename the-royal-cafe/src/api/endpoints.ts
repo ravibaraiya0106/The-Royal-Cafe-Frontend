@@ -56,4 +56,8 @@ export const ENDPOINTS = {
     UPDATE: (id: string) => `/blog/update/${id}`,
     DELETE: (id: string) => `/blog/delete/${id}`,
   },
+  USER_PROFILE: {
+    GET_BY_ID: (id: string) => `/user/${id}`,
+    UPDATE: (id: string) => `/user/update/${id}`,
+  },
 };
