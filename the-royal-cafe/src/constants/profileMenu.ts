@@ -2,6 +2,7 @@ import type { DropdownItem } from "@/types/common";
 import { logoutService } from "@/services/authService";
 import { toastSuccess } from "@/utils/toast";
 import { logout } from "@/utils/storage";
+import { ROUTES } from "@/constants/Navigation";
 
 export const user = {
   name: "Joseph McFall",
@@ -19,6 +20,7 @@ export const userLogout = async () => {
   } finally {
     logout(); // clear local storage
     window.dispatchEvent(new Event("authChanged"));
+    window.location.href = ROUTES.HOME;
   }
 };
 

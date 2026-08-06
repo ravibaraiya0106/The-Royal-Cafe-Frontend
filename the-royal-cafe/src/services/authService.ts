@@ -1,6 +1,6 @@
 // src/services/authService.ts
 
-import { postRequest } from "./apiService";
+import { postRequest, putRequest } from "./apiService";
 import { ENDPOINTS } from "@/api/endpoints";
 
 /* ================= TYPES ================= */
@@ -73,4 +73,21 @@ export const logoutService = async (): Promise<string | null> => {
     console.error("Logout API failed", err);
     return null;
   }
+};
+
+/* ================= RESET PASSWORD ================= */
+export type ResetPasswordPayload = {
+  old_password: string;
+  new_password: string;
+};
+
+export const resetPasswordService = async (
+  data: ResetPasswordPayload,
+): Promise<string> => {
+  const res = await putRequest(ENDPOINTS.AUTH.RESET_PASSWORD, data);
+
+  const { success, message } = res.data;
+  if (!success) throw new Error(message);
+
+  return message as string;
 };

@@ -1,6 +1,7 @@
 import type { Dispatch, RefObject, SetStateAction } from "react";
 import { Link } from "react-router-dom";
 import type { DropdownItem, UserInfo } from "@/types/common";
+import { History, LogOut, UserRound } from "lucide-react";
 
 type ProfileMenuProps = {
   open: boolean;
@@ -21,6 +22,19 @@ const ProfileMenu = ({
   user,
   items,
 }: ProfileMenuProps) => {
+  const getIcon = (label: string) => {
+    switch (label) {
+      case "Profile":
+        return <UserRound size={16} />;
+      case "Order History":
+        return <History size={16} />;
+      case "Logout":
+        return <LogOut size={16} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="relative">
       {/* Button */}
@@ -60,7 +74,10 @@ const ProfileMenu = ({
                     className="block p-2 rounded hover:bg-brand hover:text-white"
                     onClick={() => setOpen(false)}
                   >
-                    {item.label}
+                    <span className="flex items-center gap-2">
+                      {getIcon(item.label)}
+                      <span>{item.label}</span>
+                    </span>
                   </Link>
                 ) : (
                   <button
@@ -70,7 +87,10 @@ const ProfileMenu = ({
                     }}
                     className="w-full text-left p-2 rounded hover:bg-brand hover:text-white"
                   >
-                    {item.label}
+                    <span className="flex items-center gap-2">
+                      {getIcon(item.label)}
+                      <span>{item.label}</span>
+                    </span>
                   </button>
                 )}
               </li>

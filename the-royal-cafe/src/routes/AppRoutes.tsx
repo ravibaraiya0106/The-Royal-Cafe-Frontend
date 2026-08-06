@@ -9,6 +9,7 @@ import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
 import { ROUTES } from "@/constants/Navigation";
 import UserProfile from "@/pages/user/UserProfile";
+import UserProtectedRoute from "@/routes/UserProtectedRoute";
 
 const AppRoutes = () => {
   return (
@@ -22,7 +23,14 @@ const AppRoutes = () => {
         <Route path={ROUTES.BLOGS} element={<Blog />} />
         <Route path={ROUTES.BLOG_DETAILS} element={<BlogDetails />} />
         <Route path={ROUTES.FOOD_ITEM} element={<Items />} />
-        <Route path={ROUTES.USER_PROFILE} element={<UserProfile />} />
+        <Route
+          path={ROUTES.USER_PROFILE}
+          element={
+            <UserProtectedRoute>
+              <UserProfile />
+            </UserProtectedRoute>
+          }
+        />
 
         {AdminRoutes}
         {/*  Fallback */}

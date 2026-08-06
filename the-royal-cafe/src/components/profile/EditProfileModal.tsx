@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { Box, Paper, Typography } from "@mui/material";
+
+import logo from "@/assets/images/logo.png";
 import { updateUserProfile } from "@/services/userProfileService";
 import { getUser, setAuth } from "@/utils/storage";
 import { toastSuccess, toastError } from "@/utils/toast";
@@ -24,14 +27,28 @@ const EditProfileModal = ({ open, onClose }: Props) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [open, onClose]);
+
   /* ================= LOAD USER (IMPORTANT FIX) ================= */
   useEffect(() => {
     if (open) {
       const user = getUser();
+      if (!user || typeof user !== "object") return;
+
+      const u = user as Record<string, unknown>;
       setForm({
-        first_name: user?.first_name || "",
-        last_name: user?.last_name || "",
-        phone_no: user?.phone_no || "",
+        first_name: (u.first_name as string) || "",
+        last_name: (u.last_name as string) || "",
+        phone_no: (u.phone_no as string) || "",
       });
       setErrors({});
     }
@@ -77,16 +94,22 @@ const EditProfileModal = ({ open, onClose }: Props) => {
       setLoading(true);
 
       const user = getUser();
+      if (!user || typeof user !== "object" || !("_id" in user)) {
+        toastError("Session expired. Please login again.");
+        return;
+      }
+      const userId = (user as { _id: string })._id;
 
       const formData = new FormData();
       Object.entries(form).forEach(([key, value]) =>
         formData.append(key, value),
       );
 
-      const updatedUser = await updateUserProfile(user._id, formData);
+      const updatedUser = await updateUserProfile(userId, formData);
 
       /* ✅ BETTER: use API response */
       setAuth(localStorage.getItem("token")!, updatedUser);
+      window.dispatchEvent(new Event("authChanged"));
 
       toastSuccess("Profile updated successfully");
       onClose();
@@ -97,54 +120,62 @@ const EditProfileModal = ({ open, onClose }: Props) => {
     }
   };
 
-  /* ================= BACKDROP CLICK ================= */
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
   return (
     <div
-      onClick={handleBackdropClick}
-      className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+      onClick={onClose}
     >
-      <div className="bg-white p-6 rounded-xl w-full max-w-md animate-fadeIn">
-        <h2 className="text-xl font-semibold mb-4">Edit Profile</h2>
+      <div
+        className="w-full max-w-md px-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Paper elevation={0} sx={{ p: 4, borderRadius: "5px" }}>
+          {/* BRAND */}
+          <div className="text-center mb-4">
+            <img src={logo} className="h-16 mx-auto" />
+            <Typography variant="body2" sx={{ mt: 1 }}>
+              Update your profile details
+            </Typography>
+          </div>
 
-        <InputField
-          label="First Name"
-          name="first_name"
-          value={form.first_name}
-          onChange={handleChange}
-          error={errors.first_name}
-        />
-
-        <InputField
-          label="Last Name"
-          name="last_name"
-          value={form.last_name}
-          onChange={handleChange}
-          error={errors.last_name}
-        />
-
-        <InputField
-          label="Phone"
-          name="phone_no"
-          value={form.phone_no}
-          onChange={handleChange}
-          error={errors.phone_no}
-        />
-
-        <div className="flex gap-3 mt-4">
-          <PrimaryButton
-            label="Update"
-            loading={loading}
-            onClick={handleSubmit}
+          <InputField
+            label="First Name"
+            name="first_name"
+            value={form.first_name}
+            onChange={handleChange}
+            error={errors.first_name}
           />
 
-          <SecondaryButton label="Cancel" onClick={onClose} fullWidth={false} />
-        </div>
+          <Box sx={{ mt: 2 }}>
+            <InputField
+              label="Last Name"
+              name="last_name"
+              value={form.last_name}
+              onChange={handleChange}
+              error={errors.last_name}
+            />
+          </Box>
+
+          <Box sx={{ mt: 2 }}>
+            <InputField
+              label="Phone"
+              name="phone_no"
+              value={form.phone_no}
+              onChange={handleChange}
+              error={errors.phone_no}
+            />
+          </Box>
+
+          {/* BUTTONS */}
+          <div className="mt-4 flex gap-3">
+            <PrimaryButton
+              label="Update"
+              loading={loading}
+              onClick={handleSubmit}
+            />
+            <SecondaryButton label="Close" onClick={onClose} />
+          </div>
+        </Paper>
       </div>
     </div>
   );

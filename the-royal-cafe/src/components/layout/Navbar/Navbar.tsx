@@ -39,13 +39,14 @@ const Navbar = () => {
     const storedUser = getUser();
     if (!storedUser) return null;
 
-    const name = `${storedUser.first_name} ${storedUser.last_name}`;
+    const firstName = (storedUser.first_name ?? "").toString();
+    const lastName = (storedUser.last_name ?? "").toString();
+    const name = `${firstName} ${lastName}`.trim();
     return {
       name,
       email: storedUser.email || "",
       avatar: storedUser.avatar || "",
-      initials:
-        `${storedUser.first_name[0]}${storedUser.last_name[0]}`.toUpperCase(),
+      initials: `${firstName[0] ?? ""}${lastName[0] ?? ""}`.toUpperCase(),
     };
   };
 

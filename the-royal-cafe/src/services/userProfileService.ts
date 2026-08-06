@@ -16,8 +16,8 @@ export const getUserProfileById = async (id: string) => {
 export const updateUserProfile = async (id: string, formData: FormData) => {
   const res = await putRequest(ENDPOINTS.USER_PROFILE.UPDATE(id), formData, true);
 
-  const { success, message } = res.data;
+  const { success, message, responseData } = res.data;
 
   if (!success) throw new Error(message);
-  return message;
+  return responseData;
 };
