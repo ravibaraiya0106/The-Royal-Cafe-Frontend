@@ -17,7 +17,8 @@ import { FiStar } from "react-icons/fi";
 type Review = {
   _id: string;
   user?: {
-    username: string;
+    first_name: string;
+    last_name: string;
   };
   product?: {
     name: string;
@@ -281,7 +282,7 @@ const Reviews = () => {
                           {r.product?.name || "Product"}
                         </p>
                         <p className="text-sm text-gray-600 mt-1">
-                          By {r.user?.username || "User"}
+                          By {r.user?.first_name + " " + r.user?.last_name || "User"}
                         </p>
                       </div>
 
