@@ -61,4 +61,10 @@ export const ENDPOINTS = {
     GET_BY_ID: (id: string) => `/user/${id}`,
     UPDATE: (id: string) => `/user/update/${id}`,
   },
+  CART: {
+    CREATE: "/cart/create",
+  },
+  ORDER: {
+    CREATE: "/order/create",
+  },
 };

@@ -11,6 +11,7 @@ import { ROUTES } from "@/constants/Navigation";
 import UserProfile from "@/pages/user/UserProfile";
 import UserProtectedRoute from "@/routes/UserProtectedRoute";
 import Cart from "@/pages/cart/Cart";
+import Checkout from "@/pages/checkout/Checkout";
 
 const AppRoutes = () => {
   return (
@@ -25,6 +26,7 @@ const AppRoutes = () => {
         <Route path={ROUTES.BLOG_DETAILS} element={<BlogDetails />} />
         <Route path={ROUTES.FOOD_ITEM} element={<Items />} />
         <Route path={ROUTES.CART} element={<Cart />} />
+        <Route path={ROUTES.CHECKOUT} element={<Checkout />} />
         <Route
           path={ROUTES.USER_PROFILE}
           element={

@@ -11,6 +11,7 @@ export const ROUTES = {
   CONTACT: "/contact",
   FOOD_ITEM: "/fooditem",
   CART: "/cart",
+  CHECKOUT: "/checkout",
   REGISTER: "/register",
   FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",

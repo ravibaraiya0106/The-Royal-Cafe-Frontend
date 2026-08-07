@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
@@ -10,10 +10,11 @@ import {
   DangerButton,
   RoundButton,
 } from "@/components/common/form/Button";
-import { toastInfo, toastSuccess } from "@/utils/toast";
+import { toastSuccess } from "@/utils/toast";
 import ConfirmDialog from "@/components/Admin/modals/ConfirmDialog";
 
 const Cart = () => {
+  const navigate = useNavigate();
   const { items, cartCount, addItem, decrementItem, removeItem, clearCart } =
     useCart();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
@@ -39,9 +40,8 @@ const Cart = () => {
 
   const handleCheckout = useCallback(() => {
     if (items.length === 0) return;
-    toastInfo("Checkout flow is not connected yet.");
-    // Keeping items intact to avoid surprising data loss.
-  }, [items.length]);
+    navigate(ROUTES.CHECKOUT);
+  }, [items.length, navigate]);
 
   const handleRequestClear = useCallback(() => {
     if (items.length === 0) return;
