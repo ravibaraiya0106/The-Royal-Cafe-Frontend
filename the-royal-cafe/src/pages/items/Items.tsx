@@ -11,6 +11,7 @@ type Item = {
   name: string;
   description?: string;
   image?: string;
+  price?: number;
   is_special?: boolean;
   category?: { _id: string; name: string } | string;
 };
@@ -169,10 +170,11 @@ const Items = () => {
             <ItemCard
               key={item._id}
               item={{
-                id: Number(item._id),
+                id: item._id,
                 name: item.name,
                 description: item.description,
                 image: getImageUrl(item.image),
+                price: item.price,
                 is_special: item.is_special,
                 category:
                   typeof item.category === "string"

@@ -13,6 +13,7 @@ import ProfileMenu from "./ProfileMenu.tsx";
 import { useClickOutside } from "@/hooks/useClickOutside";
 import { PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
 import type { UserInfo } from "@/types/common";
+import { useCart } from "@/hooks/useCart";
 
 import { PrimaryButton } from "@/components/common/form/Button.tsx";
 
@@ -53,6 +54,8 @@ const Navbar = () => {
   const [currentUser, setCurrentUser] = useState<UserInfo | null>(
     getInitialUser,
   );
+
+  const { cartCount } = useCart();
 
   useEffect(() => {
     const updateUserInfo = () => setCurrentUser(getInitialUser());
@@ -125,7 +128,7 @@ const Navbar = () => {
 
           {/* RIGHT SIDE */}
           <div className="flex items-center md:order-2 space-x-3 flex-nowrap">
-            <CartButton cartCount={3} />
+            <CartButton cartCount={cartCount} />
 
             {!currentUser ? (
               <PrimaryButton label="Login" onClick={() => setLoginOpen(true)} />

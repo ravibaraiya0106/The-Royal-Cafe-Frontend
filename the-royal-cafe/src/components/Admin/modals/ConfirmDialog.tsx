@@ -12,6 +12,9 @@ type Props = {
   onClose: () => void;
   onConfirm: () => void;
   loading?: boolean;
+  cancelLabel?: string;
+  confirmLabel?: string;
+  confirmLoadingLabel?: string;
 };
 
 const ConfirmDialog = ({
@@ -21,6 +24,9 @@ const ConfirmDialog = ({
   onClose,
   onConfirm,
   loading = false,
+  cancelLabel = "Cancel",
+  confirmLabel = "Delete",
+  confirmLoadingLabel = "Deleting...",
 }: Props) => {
   if (!open) return null;
 
@@ -58,10 +64,10 @@ const ConfirmDialog = ({
 
           {/* Actions */}
           <div className="flex gap-3 mt-4">
-            <SecondaryButton label="Cancel" onClick={onClose} fullWidth />
+            <SecondaryButton label={cancelLabel} onClick={onClose} fullWidth />
 
             <PrimaryButton
-              label={loading ? "Deleting..." : "Delete"}
+              label={loading ? confirmLoadingLabel : confirmLabel}
               onClick={onConfirm}
               loading={loading}
               fullWidth

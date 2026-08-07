@@ -1,20 +1,23 @@
-import { useState } from "react";
 import SpecialBadge from "../common/badge/SpecialBadge";
 import Badge from "../common/badge/Badge";
 import { FiLayers, FiMinus, FiPlus } from "react-icons/fi";
 import { PrimaryButton, RoundButton } from "../common/form/Button";
+import { useCart } from "@/hooks/useCart";
 
 type Item = {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   image: string;
+  price?: number;
   is_special?: boolean;
   category?: { id: number; name: string } | string;
 };
 
 const ItemCard = ({ item }: { item: Item }) => {
-  const [count, setCount] = useState(0);
+  const { items: cartItems, addItem, decrementItem } = useCart();
+  const cartItem = cartItems.find((it) => it.productId === item.id);
+  const count = cartItem?.quantity ?? 0;
 
   const categoryName =
     typeof item.category === "string" ? item.category : item.category?.name;
@@ -64,14 +67,22 @@ const ItemCard = ({ item }: { item: Item }) => {
           <PrimaryButton
             label="Add to Cart"
             fullWidth={false}
-            onClick={() => setCount(1)}
+            onClick={() => {
+              addItem({
+                productId: item.id,
+                name: item.name,
+                image: item.image,
+                price: item.price,
+                quantity: 1,
+              });
+            }}
           />
         ) : (
           <div className="flex items-center justify-center gap-4">
             <RoundButton
               icon={<FiMinus size={16} />}
               variant="secondary"
-              onClick={() => setCount(count - 1)}
+              onClick={() => decrementItem(item.id)}
             />
 
             <span className="font-semibold text-lg">{count}</span>
@@ -79,7 +90,15 @@ const ItemCard = ({ item }: { item: Item }) => {
             <RoundButton
               icon={<FiPlus size={16} />}
               variant="primary"
-              onClick={() => setCount(count + 1)}
+              onClick={() => {
+                addItem({
+                  productId: item.id,
+                  name: item.name,
+                  image: item.image,
+                  price: item.price,
+                  quantity: 1,
+                });
+              }}
             />
           </div>
         )}
