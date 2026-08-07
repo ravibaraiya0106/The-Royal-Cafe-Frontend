@@ -9,6 +9,7 @@ import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
 import { ROUTES } from "@/constants/Navigation";
 import UserProfile from "@/pages/user/UserProfile";
+import OrderHistory from "@/pages/user/OrderHistory";
 import UserProtectedRoute from "@/routes/UserProtectedRoute";
 import Cart from "@/pages/cart/Cart";
 import Checkout from "@/pages/checkout/Checkout";
@@ -32,6 +33,14 @@ const AppRoutes = () => {
           element={
             <UserProtectedRoute>
               <UserProfile />
+            </UserProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.ORDER_HISTORY}
+          element={
+            <UserProtectedRoute>
+              <OrderHistory />
             </UserProtectedRoute>
           }
         />

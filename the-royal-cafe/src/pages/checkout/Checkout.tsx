@@ -15,13 +15,10 @@ import { postRequest } from "@/services/apiService";
 import { getToken, getUser } from "@/utils/storage";
 
 type CheckoutForm = {
-  fullName: string;
-  email: string;
   phone: string;
   address: string;
-  city: string;
-  pincode: string;
   paymentMethod: "COD" | "UPI" | "CARD";
+  notes?: string;
 };
 
 const paymentOptions = [
@@ -43,13 +40,10 @@ const Checkout = () => {
   const [orderId, setOrderId] = useState<string>("");
 
   const [form, setForm] = useState<CheckoutForm>({
-    fullName: "",
-    email: "",
     phone: "",
     address: "",
-    city: "",
-    pincode: "",
     paymentMethod: "COD",
+    notes: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -67,20 +61,6 @@ const Checkout = () => {
     window.addEventListener("authChanged", handleAuthChanged);
     return () => window.removeEventListener("authChanged", handleAuthChanged);
   }, []);
-
-  useEffect(() => {
-    if (!user || typeof user !== "object") return;
-
-    const first = (user.first_name ?? "").toString();
-    const last = (user.last_name ?? "").toString();
-    const fullName = `${first} ${last}`.trim();
-
-    setForm((prev) => ({
-      ...prev,
-      fullName: prev.fullName || fullName,
-      email: prev.email || (user.email ?? ""),
-    }));
-  }, [user]);
 
   useEffect(() => {
     if (success) return;
@@ -111,18 +91,9 @@ const Checkout = () => {
   const validate = useCallback(() => {
     const nextErrors: Record<string, string> = {};
 
-    if (!form.fullName.trim()) nextErrors.fullName = "Full name is required";
-    if (!form.email.trim()) nextErrors.email = "Email is required";
     if (!form.phone.trim()) nextErrors.phone = "Phone number is required";
     if (!form.address.trim()) nextErrors.address = "Address is required";
-    if (!form.city.trim()) nextErrors.city = "City is required";
-    if (!form.pincode.trim()) nextErrors.pincode = "Pincode is required";
     if (!form.paymentMethod) nextErrors.paymentMethod = "Payment method is required";
-
-    const pincodeDigits = form.pincode.replace(/\D/g, "");
-    if (form.pincode.trim() && pincodeDigits.length < 6) {
-      nextErrors.pincode = "Pincode must be at least 6 digits";
-    }
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
@@ -185,6 +156,7 @@ const Checkout = () => {
         address: form.address,
         phone: form.phone,
         payment_method: form.paymentMethod,
+        notes: form.notes || "",
       });
 
       const { success, message, responseData } = orderRes.data as {
@@ -211,6 +183,7 @@ const Checkout = () => {
     form.address,
     form.phone,
     form.paymentMethod,
+    form.notes,
     validate,
   ]);
 
@@ -235,7 +208,7 @@ const Checkout = () => {
             <div className="text-sm text-gray-600 mt-2">
               Delivery to:{" "}
               <span className="font-semibold text-gray-900">
-                {form.address}, {form.city} - {form.pincode}
+                {form.address}
               </span>
             </div>
           </div>
@@ -252,13 +225,10 @@ const Checkout = () => {
               onClick={() => {
                 setSuccess(false);
                 setForm({
-                  fullName: "",
-                  email: "",
                   phone: "",
                   address: "",
-                  city: "",
-                  pincode: "",
                   paymentMethod: "COD",
+                  notes: "",
                 });
                 setErrors({});
                 setOrderId("");
@@ -313,21 +283,6 @@ const Checkout = () => {
             </h2>
 
             <InputField
-              label="Full Name"
-              name="fullName"
-              value={form.fullName}
-              onChange={handleChange}
-              error={errors.fullName}
-            />
-            <InputField
-              label="Email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              error={errors.email}
-              type="email"
-            />
-            <InputField
               label="Phone"
               name="phone"
               value={form.phone}
@@ -344,22 +299,13 @@ const Checkout = () => {
               row={3}
             />
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <InputField
-                label="City"
-                name="city"
-                value={form.city}
-                onChange={handleChange}
-                error={errors.city}
-              />
-              <InputField
-                label="Pincode"
-                name="pincode"
-                value={form.pincode}
-                onChange={handleChange}
-                error={errors.pincode}
-              />
-            </div>
+            <TextAreaField
+              label="Notes (optional)"
+              name="notes"
+              value={form.notes || ""}
+              onChange={handleChange}
+              row={2}
+            />
 
             <div className="mt-2">
               <SelectField

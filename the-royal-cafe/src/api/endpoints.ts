@@ -66,5 +66,7 @@ export const ENDPOINTS = {
   },
   ORDER: {
     CREATE: "/order/create",
+    LIST: "/order/list",
+    DETAILS: (id: string) => `/order/details/${id}`,
   },
 };
