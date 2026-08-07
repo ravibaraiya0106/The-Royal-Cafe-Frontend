@@ -33,7 +33,9 @@ const Checkout = () => {
 
   const [token, setToken] = useState<string | null>(() => getToken());
   const [user, setUser] = useState(() => getUser());
-  const [loginOpen, setLoginOpen] = useState<boolean>(() => !getToken() || !getUser());
+  const [loginOpen, setLoginOpen] = useState<boolean>(
+    () => !getToken() || !getUser(),
+  );
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -70,7 +72,9 @@ const Checkout = () => {
   }, [items.length, navigate, success]);
 
   const hasPrices = useMemo(() => {
-    return items.length > 0 && items.every((it) => typeof it.price === "number");
+    return (
+      items.length > 0 && items.every((it) => typeof it.price === "number")
+    );
   }, [items]);
 
   const subtotal = useMemo(() => {
@@ -93,27 +97,25 @@ const Checkout = () => {
 
     if (!form.phone.trim()) nextErrors.phone = "Phone number is required";
     if (!form.address.trim()) nextErrors.address = "Address is required";
-    if (!form.paymentMethod) nextErrors.paymentMethod = "Payment method is required";
+    if (!form.paymentMethod)
+      nextErrors.paymentMethod = "Payment method is required";
 
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0;
   }, [form]);
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const { name, value } = e.target;
-      setForm((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
 
-      setErrors((prev) => ({
-        ...prev,
-        [name]: "",
-      }));
-    },
-    [],
-  );
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  }, []);
 
   const handlePaymentChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -192,7 +194,9 @@ const Checkout = () => {
       <>
         <Navbar />
         <div className="mt-10 mb-10 px-4 max-w-screen-xl mx-auto">
-          <h1 className="text-3xl font-bold text-brand mb-2">Order Confirmed</h1>
+          <h1 className="text-3xl font-bold text-brand mb-2">
+            Order Confirmed
+          </h1>
           <p className="text-gray-600">
             Your order has been placed. Order ID:{" "}
             <span className="font-semibold">{orderId}</span>
@@ -246,10 +250,7 @@ const Checkout = () => {
     return (
       <>
         <Navbar />
-        <LoginModal
-          open={loginOpen}
-          onClose={() => navigate(ROUTES.ITEMS)}
-        />
+        <LoginModal open={loginOpen} onClose={() => navigate(ROUTES.ITEMS)} />
         <Footer />
       </>
     );
@@ -326,11 +327,6 @@ const Checkout = () => {
                 fullWidth
               />
             </div>
-
-            <p className="mt-3 text-xs text-gray-500 leading-relaxed">
-              Placing your order will save it in the database and clear your
-              cart after success.
-            </p>
           </div>
 
           {/* Summary */}
@@ -393,4 +389,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

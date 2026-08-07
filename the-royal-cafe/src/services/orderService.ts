@@ -17,3 +17,11 @@ export const getOrderDetails = async (id: string) => {
   return responseData;
 };
 
+export const adminOrdersList = async () => {
+  const res = await getRequest(ENDPOINTS.ORDER.ADMIN_LIST);
+  const { success, message, responseData } = res.data;
+
+  if (!success) throw new Error(message);
+  return responseData;
+};
+

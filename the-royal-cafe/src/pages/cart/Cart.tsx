@@ -20,7 +20,9 @@ const Cart = () => {
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const hasPrices = useMemo(() => {
-    return items.length > 0 && items.every((it) => typeof it.price === "number");
+    return (
+      items.length > 0 && items.every((it) => typeof it.price === "number")
+    );
   }, [items]);
 
   const subtotal = useMemo(() => {
@@ -219,11 +221,6 @@ const Cart = () => {
                 fullWidth
               />
             </div>
-
-            <p className="mt-3 text-xs text-gray-500 leading-relaxed">
-              Checkout is a UI placeholder for now. Your cart items are saved
-              locally so you can keep browsing.
-            </p>
           </div>
         </div>
       </div>
@@ -233,4 +230,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

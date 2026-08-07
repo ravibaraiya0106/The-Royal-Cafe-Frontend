@@ -68,5 +68,6 @@ export const ENDPOINTS = {
     CREATE: "/order/create",
     LIST: "/order/list",
     DETAILS: (id: string) => `/order/details/${id}`,
+    ADMIN_LIST: "/order/admin/list",
   },
 };
