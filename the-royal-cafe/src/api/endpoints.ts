@@ -34,6 +34,7 @@ export const ENDPOINTS = {
   REVIEWS: {
     GET_ALL: "/review/list",
     GET_BY_ID: (id: string) => `/review/${id}`,
+    CREATE: "/review/create",
     DELETE: (id: string) => `/review/delete/${id}`,
   },
   COUPONS: {

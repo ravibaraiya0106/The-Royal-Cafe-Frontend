@@ -1,4 +1,4 @@
-import { deleteRequest, getRequest } from "./apiService";
+import { deleteRequest, getRequest, postRequest } from "./apiService";
 import { ENDPOINTS } from "@/api/endpoints";
 
 /* ================= GET ALL ================= */
@@ -31,4 +31,26 @@ export const deleteReview = async (id: string) => {
 
   if (!success) throw new Error(message);
   return message;
+};
+
+/* ================= CREATE (USER) ================= */
+export const createReview = async (form: {
+  product: string;
+  rating: number;
+  comment?: string;
+}) => {
+  const res = await postRequest(ENDPOINTS.REVIEWS.CREATE, {
+    product: form.product,
+    rating: form.rating,
+    comment: form.comment || "",
+  });
+
+  const { success, message, data } = res.data as {
+    success: boolean;
+    message: string;
+    data: unknown;
+  };
+
+  if (!success) throw new Error(message);
+  return data;
 };

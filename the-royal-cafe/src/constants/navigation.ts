@@ -8,6 +8,7 @@ export const ROUTES = {
   ITEMS: "/items",
   BLOGS: "/blogs",
   BLOG_DETAILS: "/blogs/:id",
+  REVIEWS: "/reviews",
   CONTACT: "/contact",
   FOOD_ITEM: "/fooditem",
   CART: "/cart",
@@ -24,6 +25,7 @@ export const NAV_ITEMS: NavItemType[] = [
   { label: "About", to: ROUTES.ABOUT },
   { label: "Items", to: ROUTES.ITEMS },
   { label: "Blogs", to: ROUTES.BLOGS },
+  { label: "Reviews", to: ROUTES.REVIEWS },
   { label: "Contact", to: ROUTES.CONTACT },
 ];
 
@@ -32,5 +34,6 @@ export const QUICK_LINKS: NavItemType[] = [
   { label: "About", to: ROUTES.ABOUT },
   { label: "Items", to: ROUTES.ITEMS },
   { label: "Blogs", to: ROUTES.BLOGS },
+  { label: "Reviews", to: ROUTES.REVIEWS },
   { label: "Contact", to: ROUTES.CONTACT },
 ];

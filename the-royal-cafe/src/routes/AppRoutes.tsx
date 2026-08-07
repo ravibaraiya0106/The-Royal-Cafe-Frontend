@@ -13,6 +13,7 @@ import OrderHistory from "@/pages/user/OrderHistory";
 import UserProtectedRoute from "@/routes/UserProtectedRoute";
 import Cart from "@/pages/cart/Cart";
 import Checkout from "@/pages/checkout/Checkout";
+import Reviews from "@/pages/reviews/Reviews";
 
 const AppRoutes = () => {
   return (
@@ -44,6 +45,7 @@ const AppRoutes = () => {
             </UserProtectedRoute>
           }
         />
+        <Route path={ROUTES.REVIEWS} element={<Reviews />} />
 
         {AdminRoutes}
         {/*  Fallback */}
