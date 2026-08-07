@@ -57,3 +57,15 @@ export const deleteCoupon = async (id: string) => {
   if (!success) throw new Error(message);
   return message;
 };
+
+/* ================= AVAILABLE (FOR CHECKOUT) ================= */
+export const getAvailableCoupons = async (orderAmount: number) => {
+  const res = await getRequest(ENDPOINTS.COUPONS.AVAILABLE, {
+    order_amount: orderAmount,
+  });
+
+  const { success, message, responseData } = res.data;
+  if (!success) throw new Error(message);
+
+  return responseData;
+};

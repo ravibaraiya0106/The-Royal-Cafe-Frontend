@@ -12,13 +12,16 @@ import { toastError, toastSuccess } from "@/utils/toast";
 import LoginModal from "@/components/auth/LoginModal";
 import { ENDPOINTS } from "@/api/endpoints";
 import { postRequest } from "@/services/apiService";
+import { getAvailableCoupons } from "@/services/couponsService";
 import { getToken, getUser } from "@/utils/storage";
+import SelectCouponModal from "@/components/common/modals/SelectCouponModal";
 
 type CheckoutForm = {
   phone: string;
   address: string;
   paymentMethod: "COD" | "UPI" | "CARD";
   notes?: string;
+  couponCode?: string;
 };
 
 const paymentOptions = [
@@ -40,12 +43,24 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
+  const [finalAmount, setFinalAmount] = useState<number>(0);
+  const [couponModalOpen, setCouponModalOpen] = useState(false);
+  const [appliedCoupon, setAppliedCoupon] = useState<null | {
+    code: string;
+    description: string;
+    discount_type: "percentage" | "flat";
+    discount_value: number;
+    min_order_amount: number;
+    max_discount: number | null;
+    expiry_date: string;
+  }>(null);
 
   const [form, setForm] = useState<CheckoutForm>({
     phone: "",
     address: "",
     paymentMethod: "COD",
     notes: "",
+    couponCode: "",
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -83,6 +98,65 @@ const Checkout = () => {
       return sum + it.price * it.quantity;
     }, 0);
   }, [items]);
+
+  const offerDiscountAmount = useMemo(() => {
+    if (!appliedCoupon) return 0;
+
+    const { discount_type, discount_value, max_discount, min_order_amount } =
+      appliedCoupon;
+
+    if (subtotal < min_order_amount) return 0;
+
+    const raw =
+      discount_type === "percentage"
+        ? (subtotal * discount_value) / 100
+        : discount_value;
+
+    const capped = max_discount != null ? Math.min(raw, max_discount) : raw;
+    if (!Number.isFinite(capped)) return 0;
+    return Math.max(0, capped);
+  }, [appliedCoupon, subtotal]);
+
+  const totalAfterDiscount = useMemo(() => {
+    return Math.max(0, subtotal - offerDiscountAmount);
+  }, [subtotal, offerDiscountAmount]);
+
+  useEffect(() => {
+    const code = (form.couponCode || "").trim();
+
+    if (!code) {
+      setAppliedCoupon(null);
+      return;
+    }
+
+    if (!hasPrices) {
+      setAppliedCoupon(null);
+      return;
+    }
+
+    let cancelled = false;
+
+    const run = async () => {
+      try {
+        const list = await getAvailableCoupons(subtotal);
+        const match =
+          Array.isArray(list) && list.length > 0
+            ? list.find((c) => c.code === code) ?? null
+            : null;
+
+        if (!cancelled) setAppliedCoupon(match);
+      } catch {
+        if (!cancelled) setAppliedCoupon(null);
+      }
+    };
+
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [form.couponCode, hasPrices, subtotal]);
+
 
   const formatMoney = (value: number) => {
     return new Intl.NumberFormat(undefined, {
@@ -159,18 +233,27 @@ const Checkout = () => {
         phone: form.phone,
         payment_method: form.paymentMethod,
         notes: form.notes || "",
+        coupon_code: form.couponCode || "",
       });
 
       const { success, message, responseData } = orderRes.data as {
         success: boolean;
         message: string;
-        responseData: { order?: { order_number?: string } };
+        responseData: {
+          order?: {
+            order_number?: string;
+            final_amount?: number;
+            discount_amount?: number;
+          };
+        };
       };
 
       if (!success) throw new Error(message || "Failed to create order");
       const nextOrderNumber = responseData?.order?.order_number ?? "";
+      const nextFinalAmount = responseData?.order?.final_amount ?? 0;
 
       setOrderId(nextOrderNumber);
+      setFinalAmount(nextFinalAmount);
       clearCart();
       setSuccess(true);
       toastSuccess("Order placed successfully!");
@@ -185,6 +268,7 @@ const Checkout = () => {
     form.address,
     form.phone,
     form.paymentMethod,
+    form.couponCode,
     form.notes,
     validate,
   ]);
@@ -200,6 +284,12 @@ const Checkout = () => {
           <p className="text-gray-600">
             Your order has been placed. Order ID:{" "}
             <span className="font-semibold">{orderId}</span>
+          </p>
+          <p className="text-gray-600 mt-2">
+            Total Amount:{" "}
+            <span className="font-semibold text-gray-900">
+              {formatMoney(finalAmount)}
+            </span>
           </p>
 
           <div className="mt-6 bg-white border border-gray-200 rounded-xl p-5">
@@ -233,9 +323,11 @@ const Checkout = () => {
                   address: "",
                   paymentMethod: "COD",
                   notes: "",
+                  couponCode: "",
                 });
                 setErrors({});
                 setOrderId("");
+                setFinalAmount(0);
               }}
               fullWidth={false}
             />
@@ -259,6 +351,20 @@ const Checkout = () => {
   return (
     <>
       <Navbar />
+
+      <SelectCouponModal
+        open={couponModalOpen}
+        orderAmount={subtotal}
+        onClose={() => setCouponModalOpen(false)}
+        onApply={(code) => {
+          setForm((prev) => ({
+            ...prev,
+            couponCode: code,
+          }));
+          toastSuccess(`Coupon applied: ${code}`);
+        }}
+      />
+
       <div className="mt-10 mb-10 px-4 max-w-screen-xl mx-auto">
         <div className="flex items-end justify-between gap-4 flex-wrap">
           <div>
@@ -308,6 +414,26 @@ const Checkout = () => {
               row={2}
             />
 
+            <div className="mt-2 flex gap-3 items-end">
+              <div className="flex-1 min-w-[200px]">
+                <InputField
+                  label="Coupon Code (optional)"
+                  name="couponCode"
+                  value={form.couponCode || ""}
+                  onChange={handleChange}
+                  error={errors.couponCode}
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setCouponModalOpen(true)}
+                className="shrink-0 border border-brand text-brand px-4 h-10 rounded-[5px] shadow hover:bg-brand hover:text-white transition text-sm font-semibold flex items-center justify-center"
+              >
+                Select Coupon
+              </button>
+            </div>
+
             <div className="mt-2">
               <SelectField
                 label="Payment Method"
@@ -348,10 +474,27 @@ const Checkout = () => {
                   {hasPrices ? formatMoney(0) : "N/A"}
                 </span>
               </div>
+              {appliedCoupon ? (
+                <div className="space-y-1">
+                  <div className="flex justify-between gap-3">
+                    <span className="text-gray-600">
+                      Offer ({appliedCoupon.code})
+                    </span>
+                    <span className="font-semibold text-brand">
+                      -{hasPrices ? formatMoney(offerDiscountAmount) : "₹0"}
+                    </span>
+                  </div>
+                  {appliedCoupon.description ? (
+                    <div className="text-xs text-gray-500 line-clamp-2">
+                      {appliedCoupon.description}
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
               <div className="border-t border-gray-100 pt-3 flex justify-between">
                 <span className="text-gray-700 font-medium">Total</span>
                 <span className="text-gray-900 font-bold text-lg">
-                  {hasPrices ? formatMoney(subtotal) : "N/A"}
+                  {hasPrices ? formatMoney(totalAfterDiscount) : "N/A"}
                 </span>
               </div>
             </div>

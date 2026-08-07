@@ -38,6 +38,7 @@ export const ENDPOINTS = {
   },
   COUPONS: {
     GET_ALL: "/coupon/list",
+    AVAILABLE: "/coupon/available",
     GET_BY_ID: (id: string) => `/coupon/${id}`,
     CREATE: "/coupon/create",
     UPDATE: (id: string) => `/coupon/update/${id}`,

@@ -8,6 +8,16 @@ import { Link } from "react-router-dom";
 
 type UserOrder = {
   order_number: string;
+  discount_amount?: number;
+  coupon?: null | {
+    code: string;
+    description?: string;
+    discount_type?: "percentage" | "flat" | string;
+    discount_value?: number;
+    min_order_amount?: number;
+    max_discount?: number | null;
+    expiry_date?: string;
+  };
   final_amount: number;
   payment_method: "COD" | "UPI" | "CARD" | string;
   payment_status: "pending" | "paid" | "failed" | string;
@@ -136,6 +146,24 @@ const OrderHistory = () => {
                     </span>
                   </p>
                 </div>
+
+                {o.coupon ? (
+                  <div className="mt-3 text-sm text-gray-600 space-y-1">
+                    <p>
+                      <span className="font-semibold text-gray-900">Coupon:</span>{" "}
+                      {o.coupon.code}
+                    </p>
+                    {o.coupon.description ? (
+                      <p className="text-xs text-gray-500 line-clamp-2">
+                        {o.coupon.description}
+                      </p>
+                    ) : null}
+                    <p>
+                      <span className="font-semibold text-gray-900">Discount:</span>{" "}
+                      -{formatMoney(o.discount_amount ?? 0)}
+                    </p>
+                  </div>
+                ) : null}
 
                 <div className="mt-3 text-sm text-gray-600">
                   <p>
