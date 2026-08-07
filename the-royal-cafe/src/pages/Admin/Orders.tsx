@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AdminLayout from "@/Layouts/AdminLayout";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
@@ -22,30 +22,6 @@ type AdminOrder = {
 };
 
 const Orders = () => {
-  const [loading, setLoading] = useState(false);
-  const [orders, setOrders] = useState<AdminOrder[]>([]);
-  const [page, setPage] = useState(1);
-
-  const limit = 8;
-  const [filters, setFilters] = useState<Record<string, unknown>>({});
-
-  const fetchAdminOrders = async () => {
-    try {
-      setLoading(true);
-      const res = await adminOrdersList();
-      setOrders(Array.isArray(res) ? res : []);
-      setPage(1);
-    } catch (err: unknown) {
-      toastError(err instanceof Error ? err.message : "Failed to load orders");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAdminOrders();
-  }, []);
-
   const formatMoney = useMemo(() => {
     return (value: number) =>
       new Intl.NumberFormat(undefined, {
@@ -115,38 +91,6 @@ const Orders = () => {
     },
   ];
 
-  const filteredOrders = useMemo(() => {
-    const orderNumber = (filters.order_number ?? "") as string;
-    const paymentMethod = (filters.payment_method ?? "") as string;
-    const paymentStatus = (filters.payment_status ?? "") as string;
-    const orderStatus = (filters.order_status ?? "") as string;
-
-    const q = orderNumber.trim().toLowerCase();
-
-    return orders.filter((o) => {
-      if (q && !String(o.order_number || "").toLowerCase().includes(q)) {
-        return false;
-      }
-      if (paymentMethod && o.payment_method !== paymentMethod) return false;
-      if (paymentStatus && o.payment_status !== paymentStatus) return false;
-      if (orderStatus && o.order_status !== orderStatus) return false;
-      return true;
-    });
-  }, [orders, filters]);
-
-  const totalPages = useMemo(() => {
-    return Math.max(1, Math.ceil(filteredOrders.length / limit));
-  }, [filteredOrders.length]);
-
-  const pagedOrders = useMemo(() => {
-    const start = (page - 1) * limit;
-    return filteredOrders.slice(start, start + limit);
-  }, [filteredOrders, page]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [filters]);
-
   const filterFields = useMemo(
     () => [
       { key: "order_number", label: "Order #", type: "text" as const },
@@ -186,6 +130,53 @@ const Orders = () => {
     [],
   );
 
+  const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState<AdminOrder[]>([]);
+
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 8,
+    order_number: "",
+    payment_method: "",
+    payment_status: "",
+    order_status: "",
+  });
+
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    totalItems: 0,
+  });
+
+  const fetchAdminOrders = useCallback(
+    async (params: typeof filters) => {
+      try {
+        setLoading(true);
+        const res = await adminOrdersList(params);
+
+        // server shape: { data, total, page, totalPages, limit }
+        setOrders(Array.isArray(res?.data) ? res.data : []);
+        setPagination({
+          page: typeof res?.page === "number" ? res.page : params.page,
+          totalPages:
+            typeof res?.totalPages === "number" ? res.totalPages : 1,
+          totalItems: typeof res?.total === "number" ? res.total : 0,
+        });
+      } catch (err: unknown) {
+        toastError(
+          err instanceof Error ? err.message : "Failed to load orders",
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    fetchAdminOrders(filters);
+  }, [filters, fetchAdminOrders]);
+
   return (
     <AdminLayout>
       <div className="p-6">
@@ -193,19 +184,37 @@ const Orders = () => {
           Orders
         </h1>
 
-        <Filter filters={filterFields} onChange={(values) => setFilters(values)} />
+        <Filter
+          filters={filterFields}
+          onChange={(values) => {
+            const isReset = Object.keys(values).length === 0;
 
-        <Table columns={columns} data={pagedOrders} loading={loading} />
+            setFilters((prev) => ({
+              ...prev,
+              page: 1,
+              order_number: isReset ? "" : String(values.order_number ?? ""),
+              payment_method: isReset
+                ? ""
+                : String(values.payment_method ?? ""),
+              payment_status: isReset ? "" : String(values.payment_status ?? ""),
+              order_status: isReset ? "" : String(values.order_status ?? ""),
+            }));
+          }}
+        />
+
+        <Table columns={columns} data={orders} loading={loading} />
 
         <Pagination
-          page={page}
-          totalPages={totalPages}
-          totalItems={filteredOrders.length}
-          limit={limit}
-          onPageChange={(next) => {
-            if (next < 1 || next > totalPages) return;
-            setPage(next);
-          }}
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+          totalItems={pagination.totalItems}
+          limit={filters.limit}
+          onPageChange={(nextPage) =>
+            setFilters((prev) => ({
+              ...prev,
+              page: nextPage,
+            }))
+          }
         />
       </div>
     </AdminLayout>

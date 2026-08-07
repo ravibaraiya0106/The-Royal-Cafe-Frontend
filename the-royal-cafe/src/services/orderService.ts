@@ -17,8 +17,8 @@ export const getOrderDetails = async (id: string) => {
   return responseData;
 };
 
-export const adminOrdersList = async () => {
-  const res = await getRequest(ENDPOINTS.ORDER.ADMIN_LIST);
+export const adminOrdersList = async (params?: Record<string, unknown>) => {
+  const res = await getRequest(ENDPOINTS.ORDER.ADMIN_LIST, params);
   const { success, message, responseData } = res.data;
 
   if (!success) throw new Error(message);

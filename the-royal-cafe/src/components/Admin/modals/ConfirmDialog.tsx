@@ -4,6 +4,7 @@ import {
   SecondaryButton,
 } from "@/components/common/form/Button";
 import Loader from "@/components/common/Loader";
+import logo from "@/assets/images/logo.png";
 
 type Props = {
   open: boolean;
@@ -42,6 +43,10 @@ const ConfirmDialog = ({
             textAlign: "center",
           }}
         >
+          <div className="flex justify-center mb-3">
+            <img src={logo} alt="Brand logo" className="h-12 object-contain" />
+          </div>
+
           {/* 🔴 Title */}
           <Typography
             variant="h6"
