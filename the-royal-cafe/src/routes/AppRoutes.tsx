@@ -15,6 +15,13 @@ import Cart from "@/pages/cart/Cart";
 import Checkout from "@/pages/checkout/Checkout";
 import Reviews from "@/pages/reviews/Reviews";
 
+import DeliveryProtectedRoute from "@/routes/DeliveryProtectedRoute";
+import DeliveryLogin from "@/pages/Delivery/DeliveryLogin";
+import DeliveryDashboard from "@/pages/Delivery/DeliveryDashboard";
+import DeliveryOrders from "@/pages/Delivery/DeliveryOrders";
+import DeliveryHistory from "@/pages/Delivery/DeliveryHistory";
+import DeliveryProfile from "@/pages/Delivery/DeliveryProfile";
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -46,6 +53,41 @@ const AppRoutes = () => {
           }
         />
         <Route path={ROUTES.REVIEWS} element={<Reviews />} />
+
+        {/* Delivery Boy Portal Routes */}
+        <Route path={ROUTES.DELIVERY_LOGIN} element={<DeliveryLogin />} />
+        <Route
+          path={ROUTES.DELIVERY_DASHBOARD}
+          element={
+            <DeliveryProtectedRoute>
+              <DeliveryDashboard />
+            </DeliveryProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.DELIVERY_ORDERS}
+          element={
+            <DeliveryProtectedRoute>
+              <DeliveryOrders />
+            </DeliveryProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.DELIVERY_HISTORY}
+          element={
+            <DeliveryProtectedRoute>
+              <DeliveryHistory />
+            </DeliveryProtectedRoute>
+          }
+        />
+        <Route
+          path={ROUTES.DELIVERY_PROFILE}
+          element={
+            <DeliveryProtectedRoute>
+              <DeliveryProfile />
+            </DeliveryProtectedRoute>
+          }
+        />
 
         {AdminRoutes}
         {/*  Fallback */}

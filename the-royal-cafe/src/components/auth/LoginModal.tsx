@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  Paper,
-  Typography,
-  IconButton,
-  InputAdornment,
-  Box,
-} from "@mui/material";
-import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { Paper, Typography, Box } from "@mui/material";
 
 import logo from "@/assets/images/logo.png";
 import { loginService } from "@/services/authService";
@@ -26,7 +19,6 @@ type Props = {
 };
 
 const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
-  const [showPassword, setShowPassword] = useState(false);
 
   const [form, setForm] = useState({
     username: "",
@@ -81,24 +73,21 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
         };
       };
 
-      /* ================= ROLE CHECK ================= */
-      if (user.role !== "user") {
-        toastError("Access denied. Admins must login from admin panel.");
-        return;
-      }
-
-      /* ================= SET AUTH ================= */
       setAuth(token, user);
-
-      toastSuccess(
-        "Welcome back, " + user.first_name + " " + user.last_name + "!",
-      );
-
-      /* CLOSE MODAL */
+      window.dispatchEvent(new Event("authChanged"));
       onClose();
 
-      /* UPDATE NAVBAR */
-      window.dispatchEvent(new Event("authChanged"));
+      const displayName = user.first_name ? `${user.first_name} ${user.last_name || ""}` : (user.username as string || "User");
+
+      if (user.role === "admin") {
+        toastSuccess(`Welcome back Admin, ${displayName}!`);
+        window.location.href = "/admin/dashboard";
+      } else if (user.role === "delivery_person") {
+        toastSuccess(`Welcome to Delivery Portal, ${displayName}!`);
+        window.location.href = "/delivery/dashboard";
+      } else {
+        toastSuccess(`Welcome back, ${displayName}!`);
+      }
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {
@@ -136,21 +125,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
             <InputField
               label="Password"
               name="password"
-              type={showPassword ? "text" : "password"}
+              type="password"
               value={form.password}
               onChange={handleChange}
               error={errors.password}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      onClick={() => setShowPassword((prev) => !prev)}
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
             />
           </Box>
 

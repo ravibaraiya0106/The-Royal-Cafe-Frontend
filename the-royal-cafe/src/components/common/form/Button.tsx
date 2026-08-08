@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 type BaseProps = {
   label?: string;
   loading?: boolean;
+  disabled?: boolean;
   onClick?: () => void;
   fullWidth?: boolean;
   icon?: ReactNode;
@@ -16,6 +17,7 @@ type BaseProps = {
 export const PrimaryButton = ({
   label,
   loading = false,
+  disabled = false,
   onClick,
   fullWidth = true,
   icon,
@@ -27,7 +29,7 @@ export const PrimaryButton = ({
       fullWidth={fullWidth}
       variant="contained"
       onClick={onClick}
-      disabled={loading}
+      disabled={loading || disabled}
       startIcon={!loading && icon}
       sx={{
         borderRadius: "5px",

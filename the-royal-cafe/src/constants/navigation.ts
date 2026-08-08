@@ -18,6 +18,11 @@ export const ROUTES = {
   RESET_PASSWORD: "/reset-password",
   USER_PROFILE: "/profile",
   ORDER_HISTORY: "/order-history",
+  DELIVERY_LOGIN: "/delivery/login",
+  DELIVERY_DASHBOARD: "/delivery/dashboard",
+  DELIVERY_ORDERS: "/delivery/orders",
+  DELIVERY_HISTORY: "/delivery/history",
+  DELIVERY_PROFILE: "/delivery/profile",
 };
 
 export const NAV_ITEMS: NavItemType[] = [

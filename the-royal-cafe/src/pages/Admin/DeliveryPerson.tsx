@@ -27,6 +27,11 @@ type DeliveryPerson = {
   email: string;
   vehicle_type: string;
   vehicle_number: string;
+  is_available?: boolean;
+  username?: string;
+  user?: {
+    username?: string;
+  } | string;
   current_location: {
     lat: number;
     lng: number;
@@ -62,6 +67,7 @@ const DeliveryPerson = () => {
     phone: "",
     vehicle_type: "",
     vehicle_number: "",
+    is_available: "",
   });
   const [pagination, setPagination] = useState({
     page: 1,
@@ -83,7 +89,6 @@ const DeliveryPerson = () => {
           totalPages: res.totalPages,
           totalItems: res.total,
         });
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
       } catch (err) {
         toastError("Failed to fetch delivery persons");
       } finally {
@@ -111,6 +116,7 @@ const DeliveryPerson = () => {
     phone: "",
     vehicle_type: "",
     vehicle_number: "",
+    is_available: "",
   };
   const getVehicleUI = (type?: string) => {
     const value = type?.toLowerCase();
@@ -138,6 +144,26 @@ const DeliveryPerson = () => {
       </div>
     );
   };
+
+  const getAvailabilityUI = (isAvailable?: boolean) => {
+    return (
+      <div
+        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ${
+          isAvailable
+            ? "bg-green-50 border-green-200 text-green-700"
+            : "bg-red-50 border-red-200 text-red-700"
+        }`}
+      >
+        <span
+          className={`w-2 h-2 rounded-full ${
+            isAvailable ? "bg-green-500 animate-pulse" : "bg-red-500"
+          }`}
+        />
+        <span>{isAvailable ? "Online (Available)" : "Offline"}</span>
+      </div>
+    );
+  };
+
   /* ================= FILTER ================= */
   const handleFilterChange = (values: Record<string, unknown>) => {
     // if reset
@@ -205,6 +231,15 @@ const DeliveryPerson = () => {
     { key: "name", label: "Search Name", type: "text" },
     { key: "phone", label: "Search Phone", type: "text" },
     {
+      key: "is_available",
+      label: "Online Status",
+      type: "select",
+      options: [
+        { label: "Online (Available)", value: "true" },
+        { label: "Offline (Unavailable)", value: "false" },
+      ],
+    },
+    {
       key: "vehicle_type",
       label: "Select Vehicle Type",
       type: "select",
@@ -220,8 +255,25 @@ const DeliveryPerson = () => {
   /* ================= TABLE ================= */
   const columns: Column<DeliveryPerson>[] = [
     { header: "Name", accessor: "name" },
+    {
+      header: "Username / Agent ID",
+      accessor: "username",
+      render: (row) => (
+        <span className="font-mono text-xs font-bold text-brand">
+          {row.username ||
+            (typeof row.user === "object" && row.user !== null
+              ? row.user.username
+              : "") ||
+            `delivery_${row.phone}`}
+        </span>
+      ),
+    },
     { header: "Phone", accessor: "phone" },
-    { header: "Email", accessor: "email" },
+    {
+      header: "Status",
+      accessor: "is_available",
+      render: (row) => getAvailabilityUI(row.is_available),
+    },
     {
       header: "Vehicle Type",
       accessor: "vehicle_type",
@@ -232,7 +284,7 @@ const DeliveryPerson = () => {
       header: "Location",
       accessor: "current_location",
       render: (row) => (
-        <div className="flex items-center gap-4">
+        <div className="text-xs font-mono text-gray-600">
           {row.current_location
             ? `${row.current_location.lat}, ${row.current_location.lng}`
             : "-"}
@@ -336,16 +388,31 @@ const DeliveryPerson = () => {
         title="Delivery Person Details"
         fields={[
           { label: "Name", value: viewData?.name },
+          {
+            label: "Username / Agent ID",
+            value:
+              viewData?.username ||
+              (typeof viewData?.user === "object" && viewData?.user !== null
+                ? viewData.user.username
+                : "") ||
+              (viewData?.phone ? `delivery_${viewData.phone}` : "-"),
+          },
           { label: "Phone", value: viewData?.phone },
           { label: "Email", value: viewData?.email },
+          {
+            label: "Online Status",
+            render: () => getAvailabilityUI(viewData?.is_available),
+          },
           {
             label: "Vehicle Type",
             render: () => getVehicleUI(viewData?.vehicle_type),
           },
           { label: "Vehicle Number", value: viewData?.vehicle_number },
           {
-            label: "Location",
-            value: `${viewData?.current_location?.lat}, ${viewData?.current_location?.lng}`,
+            label: "Location Coordinates",
+            value: viewData?.current_location
+              ? `${viewData.current_location.lat}, ${viewData.current_location.lng}`
+              : "-",
           },
         ]}
       />

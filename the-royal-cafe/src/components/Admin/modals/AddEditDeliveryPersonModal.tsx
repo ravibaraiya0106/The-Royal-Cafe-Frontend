@@ -17,6 +17,10 @@ type DeliveryPerson = {
   email: string;
   vehicle_type: string;
   vehicle_number: string;
+  username?: string;
+  user?: {
+    username?: string;
+  } | string;
   current_location: {
     lat: number;
     lng: number;
@@ -42,6 +46,8 @@ const AddEditDEliveryPersonModal = ({
     name: "",
     phone: "",
     email: "",
+    username: "",
+    password: "",
     vehicle_type: "",
     vehicle_number: "",
     current_location: {
@@ -55,10 +61,19 @@ const AddEditDEliveryPersonModal = ({
   /* ================= SET INITIAL DATA ================= */
   useEffect(() => {
     if (initialData) {
+      const extractedUsername =
+        initialData.username ||
+        (typeof initialData.user === "object" && initialData.user !== null
+          ? initialData.user.username
+          : "") ||
+        `delivery_${initialData.phone}`;
+
       setForm({
         name: initialData.name || "",
         phone: initialData.phone || "",
         email: initialData.email || "",
+        username: extractedUsername,
+        password: "",
         vehicle_type: initialData.vehicle_type || "",
         vehicle_number: initialData.vehicle_number || "",
         current_location: initialData.current_location || {
@@ -71,6 +86,8 @@ const AddEditDEliveryPersonModal = ({
         name: "",
         phone: "",
         email: "",
+        username: "",
+        password: "",
         vehicle_type: "",
         vehicle_number: "",
         current_location: {
@@ -93,7 +110,11 @@ const AddEditDEliveryPersonModal = ({
   const validate = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!form.name.trim()) newErrors.name = "Item name is required";
+    if (!form.name.trim()) newErrors.name = "Delivery person name is required";
+    if (!form.phone.trim()) newErrors.phone = "Phone is required";
+    if (!form.username.trim()) newErrors.username = "Username is required";
+    if (!initialData && !form.password.trim())
+      newErrors.password = "Password is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -111,6 +132,10 @@ const AddEditDEliveryPersonModal = ({
       formData.append("name", form.name);
       formData.append("phone", form.phone);
       formData.append("email", form.email);
+      formData.append("username", form.username.trim());
+      if (form.password.trim()) {
+        formData.append("password", form.password.trim());
+      }
       formData.append("vehicle_type", form.vehicle_type);
       formData.append("vehicle_number", form.vehicle_number);
       formData.append(
@@ -157,7 +182,7 @@ const AddEditDEliveryPersonModal = ({
           {/* ================= BODY ================= */}
           <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
             <InputField
-              label="Item Name"
+              label="Delivery Person Name"
               name="name"
               value={form.name}
               onChange={handleChange}
@@ -178,6 +203,30 @@ const AddEditDEliveryPersonModal = ({
               onChange={handleChange}
               error={errors.email}
             />
+
+            <div className="p-3.5 bg-gray-50 border border-gray-200 rounded-lg text-xs space-y-3">
+              <span className="font-bold text-brand uppercase tracking-wider block">
+                Portal Login Credentials (Required)
+              </span>
+              <div className="grid grid-cols-2 gap-3">
+                <InputField
+                  label="Username *"
+                  name="username"
+                  value={form.username}
+                  onChange={handleChange}
+                  error={errors.username}
+                />
+                <InputField
+                  label={initialData ? "New Password (Optional)" : "Password *"}
+                  name="password"
+                  type="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  error={errors.password}
+                />
+              </div>
+            </div>
+
             <SelectField
               label="Vehicle Type"
               name="vehicle_type"

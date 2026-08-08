@@ -62,18 +62,21 @@ const Login = () => {
         };
       };
 
-      if (user.role !== "admin") {
-        toastError("Access denied. Admin only.");
-        return;
-      }
-
       setAuth(token, user);
+      window.dispatchEvent(new Event("authChanged"));
 
-      toastSuccess(
-        "Welcome back, " + user.first_name + " " + user.last_name + "!",
-      );
+      const displayName = user.first_name ? `${user.first_name} ${user.last_name || ""}` : (user.username as string);
 
-      navigate(ROUTES.ADMIN_DASHBOARD);
+      if (user.role === "admin") {
+        toastSuccess(`Welcome back Admin, ${displayName}!`);
+        navigate(ROUTES.ADMIN_DASHBOARD);
+      } else if (user.role === "delivery_person") {
+        toastSuccess(`Welcome to Delivery Portal, ${displayName}!`);
+        navigate("/delivery/dashboard");
+      } else {
+        toastSuccess(`Welcome back, ${displayName}!`);
+        navigate("/");
+      }
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");
     } finally {

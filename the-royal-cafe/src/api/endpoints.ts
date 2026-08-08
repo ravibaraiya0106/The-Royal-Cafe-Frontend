@@ -72,4 +72,13 @@ export const ENDPOINTS = {
     DETAILS: (id: string) => `/order/details/${id}`,
     ADMIN_LIST: "/order/admin/list",
   },
+  DELIVERY: {
+    ASSIGN: "/delivery/assign",
+    MY_DELIVERIES: "/delivery/my-deliveries",
+    DETAILS: (id: string) => `/delivery/details/${id}`,
+    UPDATE_STATUS: (id: string) => `/delivery/update-status/${id}`,
+    TOGGLE_AVAILABILITY: "/delivery/toggle-availability",
+    UPDATE_LOCATION: "/delivery/update-location",
+    ADMIN_LIST: "/delivery/admin/list",
+  },
 };
