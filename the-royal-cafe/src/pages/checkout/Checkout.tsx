@@ -256,7 +256,7 @@ const Checkout = () => {
       setFinalAmount(nextFinalAmount);
       clearCart();
       setSuccess(true);
-      toastSuccess("Order placed successfully!");
+      toastSuccess(message);
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Failed to place order");
     } finally {

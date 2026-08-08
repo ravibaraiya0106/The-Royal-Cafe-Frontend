@@ -23,7 +23,11 @@ API.interceptors.response.use(
       localStorage.removeItem("token");
       window.location.href = "/";
     }
-    return Promise.reject(error);
+    const backendMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Something went wrong";
+    return Promise.reject(new Error(backendMessage));
   },
 );
 

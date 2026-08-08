@@ -74,7 +74,7 @@ export const assignDeliveryService = async (data: {
   const res = await postRequest(ENDPOINTS.DELIVERY.ASSIGN, data);
   const { success, message, responseData, data: resData } = res.data;
   if (!success) throw new Error(message);
-  return responseData || resData;
+  return { data: responseData || resData, message };
 };
 
 /* ================= GET MY DELIVERIES (DELIVERY BOY) ================= */
@@ -109,7 +109,7 @@ export const updateDeliveryStatusService = async (
   const res = await patchRequest(ENDPOINTS.DELIVERY.UPDATE_STATUS(id), data);
   const { success, message, responseData, data: resData } = res.data;
   if (!success) throw new Error(message);
-  return responseData || resData;
+  return { data: responseData || resData, message };
 };
 
 /* ================= TOGGLE AVAILABILITY ================= */
@@ -119,7 +119,7 @@ export const toggleAvailabilityService = async (is_available?: boolean) => {
   });
   const { success, message, responseData, data: resData } = res.data;
   if (!success) throw new Error(message);
-  return responseData || resData;
+  return { data: responseData || resData, message };
 };
 
 /* ================= UPDATE LOCATION ================= */
@@ -128,4 +128,12 @@ export const updateLocationService = async (lat: number, lng: number) => {
   const { success, message } = res.data;
   if (!success) throw new Error(message);
   return message;
+};
+
+/* ================= GET DELIVERY ANALYTICS ================= */
+export const getDeliveryAnalyticsService = async () => {
+  const res = await getRequest(ENDPOINTS.DELIVERY.ANALYTICS);
+  const { success, message, responseData, data: resData } = res.data;
+  if (!success) throw new Error(message);
+  return responseData || resData;
 };

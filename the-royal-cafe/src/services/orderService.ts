@@ -25,3 +25,11 @@ export const adminOrdersList = async (params?: Record<string, unknown>) => {
   return responseData;
 };
 
+export const getAdminAnalyticsService = async () => {
+  const res = await getRequest(ENDPOINTS.ORDER.ADMIN_ANALYTICS);
+  const { success, message, responseData } = res.data;
+
+  if (!success) throw new Error(message);
+  return responseData;
+};
+

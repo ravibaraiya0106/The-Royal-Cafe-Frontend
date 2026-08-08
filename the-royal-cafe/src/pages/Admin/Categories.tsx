@@ -146,8 +146,7 @@ const Categories = () => {
       setDeleteLoading(true);
 
       const message = await deleteCategory(selectedId);
-
-      toastSuccess(message || "Category deleted successfully");
+      toastSuccess(message);
 
       setDeleteOpen(false);
       setSelectedId(null);
@@ -261,10 +260,10 @@ const Categories = () => {
             try {
               if (editData) {
                 const message = await updateCategory(editData._id, formData);
-                toastSuccess(message || "Category updated");
+                toastSuccess(message);
               } else {
                 const message = await createCategory(formData);
-                toastSuccess(message || "Category created");
+                toastSuccess(message);
               }
 
               setOpen(false);

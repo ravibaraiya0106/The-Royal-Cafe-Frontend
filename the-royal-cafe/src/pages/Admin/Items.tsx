@@ -178,8 +178,7 @@ const Items = () => {
       setDeleteLoading(true);
 
       const message = await deleteItem(selectedId);
-
-      toastSuccess(message || "Item deleted successfully");
+      toastSuccess(message);
 
       setDeleteOpen(false);
       setSelectedId(null);
@@ -329,10 +328,10 @@ const Items = () => {
             try {
               if (editData) {
                 const message = await updateItem(editData._id, formData);
-                toastSuccess(message || "Item updated");
+                toastSuccess(message);
               } else {
                 const message = await createItem(formData);
-                toastSuccess(message || "Item created");
+                toastSuccess(message);
               }
 
               setOpen(false);

@@ -63,30 +63,25 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
     try {
       setLoading(true);
 
-      const { token, user } = (await loginService(form)) as {
-        token: string;
-        user: {
-          role: string;
-          first_name: string;
-          last_name: string;
-          [key: string]: unknown;
-        };
+      const res = await loginService(form);
+      const token = res.token;
+      const user = res.user as {
+        role?: string;
+        username?: string;
+        first_name?: string;
+        last_name?: string;
       };
 
       setAuth(token, user);
       window.dispatchEvent(new Event("authChanged"));
       onClose();
 
-      const displayName = user.first_name ? `${user.first_name} ${user.last_name || ""}` : (user.username as string || "User");
+      toastSuccess(res.message);
 
       if (user.role === "admin") {
-        toastSuccess(`Welcome back Admin, ${displayName}!`);
         window.location.href = "/admin/dashboard";
       } else if (user.role === "delivery_person") {
-        toastSuccess(`Welcome to Delivery Portal, ${displayName}!`);
         window.location.href = "/delivery/dashboard";
-      } else {
-        toastSuccess(`Welcome back, ${displayName}!`);
       }
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Invalid credentials");

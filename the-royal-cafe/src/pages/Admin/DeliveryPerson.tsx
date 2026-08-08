@@ -212,8 +212,7 @@ const DeliveryPerson = () => {
       setDeleteLoading(true);
 
       const message = await deleteDeliveryPerson(selectedId);
-
-      toastSuccess(message || "Delivery person deleted successfully");
+      toastSuccess(message);
 
       setDeleteOpen(false);
       setSelectedId(null);
@@ -357,10 +356,10 @@ const DeliveryPerson = () => {
                   editData._id,
                   formData,
                 );
-                toastSuccess(message || "Delivery person updated");
+                toastSuccess(message);
               } else {
                 const message = await createDeliveryPerson(formData);
-                toastSuccess(message || "Delivery person created");
+                toastSuccess(message);
               }
               setOpen(false);
               fetchDeliveryPersons(filters);

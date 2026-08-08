@@ -34,10 +34,8 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
     try {
       setToggling(true);
       const res = await toggleAvailabilityService(!isAvailable);
-      setIsAvailable(res.is_available);
-      toastSuccess(
-        `Status updated to ${res.is_available ? "Online (Available)" : "Offline (Unavailable)"}`,
-      );
+      setIsAvailable(res.data.is_available);
+      toastSuccess(res.message);
     } catch (err: unknown) {
       toastError(
         err instanceof Error ? err.message : "Failed to toggle status",
@@ -61,7 +59,7 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 flex font-sans text-gray-800">
+    <div className="min-h-screen bg-white flex font-sans text-gray-800">
       {/* Fixed Admin-Style Left Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-40 transition-all duration-300 ${

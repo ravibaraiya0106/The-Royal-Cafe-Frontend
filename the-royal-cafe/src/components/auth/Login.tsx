@@ -52,29 +52,31 @@ const Login = () => {
     try {
       setLoading(true);
 
-      const { token, user } = (await loginService(form)) as {
+      const res = await loginService(form) as {
         token: string;
+        message: string;
         user: {
-          role: string;
-          first_name: string;
-          last_name: string;
+          role?: string;
+          username?: string;
+          first_name?: string;
+          last_name?: string;
           [key: string]: unknown;
         };
       };
 
+      const token = res.token;
+      const user = res.user;
+
       setAuth(token, user);
       window.dispatchEvent(new Event("authChanged"));
 
-      const displayName = user.first_name ? `${user.first_name} ${user.last_name || ""}` : (user.username as string);
+      toastSuccess(res.message);
 
       if (user.role === "admin") {
-        toastSuccess(`Welcome back Admin, ${displayName}!`);
         navigate(ROUTES.ADMIN_DASHBOARD);
       } else if (user.role === "delivery_person") {
-        toastSuccess(`Welcome to Delivery Portal, ${displayName}!`);
         navigate("/delivery/dashboard");
       } else {
-        toastSuccess(`Welcome back, ${displayName}!`);
         navigate("/");
       }
     } catch (err: unknown) {

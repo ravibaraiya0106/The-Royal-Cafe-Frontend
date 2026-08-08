@@ -114,7 +114,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: Props) => {
         return;
       }
 
-      toastSuccess(message || "Registration successful! Please login");
+      toastSuccess(message);
 
       onClose();
       onSwitchToLogin?.();
