@@ -15,10 +15,13 @@ import { postRequest } from "@/services/apiService";
 import { getAvailableCoupons } from "@/services/couponsService";
 import { getToken, getUser } from "@/utils/storage";
 import SelectCouponModal from "@/components/common/modals/SelectCouponModal";
+import MapLocationPicker from "@/components/checkout/MapLocationPicker";
 
 type CheckoutForm = {
   phone: string;
   address: string;
+  latitude?: number;
+  longitude?: number;
   paymentMethod: "COD" | "UPI" | "CARD";
   notes?: string;
   couponCode?: string;
@@ -141,7 +144,7 @@ const Checkout = () => {
         const list = await getAvailableCoupons(subtotal);
         const match =
           Array.isArray(list) && list.length > 0
-            ? list.find((c) => c.code === code) ?? null
+            ? (list.find((c) => c.code === code) ?? null)
             : null;
 
         if (!cancelled) setAppliedCoupon(match);
@@ -157,7 +160,6 @@ const Checkout = () => {
     };
   }, [form.couponCode, hasPrices, subtotal]);
 
-
   const formatMoney = (value: number) => {
     return new Intl.NumberFormat(undefined, {
       style: "currency",
@@ -170,7 +172,13 @@ const Checkout = () => {
     const nextErrors: Record<string, string> = {};
 
     if (!form.phone.trim()) nextErrors.phone = "Phone number is required";
-    if (!form.address.trim()) nextErrors.address = "Address is required";
+    if (
+      !form.address.trim() ||
+      !Number.isFinite(form.latitude) ||
+      !Number.isFinite(form.longitude)
+    ) {
+      nextErrors.address = "Please confirm your delivery location from the map";
+    }
     if (!form.paymentMethod)
       nextErrors.paymentMethod = "Payment method is required";
 
@@ -230,6 +238,8 @@ const Checkout = () => {
       // 2) Create the order in DB
       const orderRes = await postRequest(ENDPOINTS.ORDER.CREATE, {
         address: form.address,
+        latitude: form.latitude,
+        longitude: form.longitude,
         phone: form.phone,
         payment_method: form.paymentMethod,
         notes: form.notes || "",
@@ -397,17 +407,27 @@ const Checkout = () => {
               error={errors.phone}
             />
 
-            <TextAreaField
-              label="Address"
-              name="address"
-              value={form.address}
-              onChange={handleChange}
-              error={errors.address}
-              row={3}
-            />
+            <div className="my-4">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">
+                Delivery Location
+              </h3>
+              <MapLocationPicker
+                selectedAddress={form.address}
+                onConfirmLocation={(address, coords) => {
+                  setForm((prev) => ({
+                    ...prev,
+                    address,
+                    latitude: coords?.lat,
+                    longitude: coords?.lng,
+                  }));
+                  setErrors((prev) => ({ ...prev, address: "" }));
+                }}
+                error={errors.address}
+              />
+            </div>
 
             <TextAreaField
-              label="Notes (optional)"
+              label="Delivery Notes (optional)"
               name="notes"
               value={form.notes || ""}
               onChange={handleChange}

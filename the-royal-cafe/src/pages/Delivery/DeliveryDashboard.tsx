@@ -285,7 +285,9 @@ const DeliveryDashboard = () => {
                         <FiMapPin className="w-4 h-4 text-brand shrink-0 mt-0.5" />
                         <div>
                           <span className="font-semibold text-gray-500 block">Delivery Address:</span>
-                          <span>{order?.address || "Address not available"}</span>
+                          <span>
+                            {order?.deliveryLocation?.address || "Address not available"}
+                          </span>
                         </div>
                       </div>
 

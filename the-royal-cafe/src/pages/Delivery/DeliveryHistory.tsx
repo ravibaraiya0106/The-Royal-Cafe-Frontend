@@ -173,7 +173,9 @@ const DeliveryHistory = () => {
 
                     <div className="flex items-center gap-2">
                       <FiMapPin className="w-4 h-4 text-brand shrink-0" />
-                      <span className="truncate">{order?.address || "Address"}</span>
+                      <span className="truncate">
+                        {order?.deliveryLocation?.address || "Address"}
+                      </span>
                     </div>
                   </div>
 

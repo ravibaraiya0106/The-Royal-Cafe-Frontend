@@ -15,6 +15,8 @@ import {
   updateDeliveryStatusService,
   type DeliveryItem,
 } from "@/services/deliveryService";
+import { useLiveLocationTracker } from "@/hooks/useLiveLocationTracker";
+import LiveDeliveryMap from "@/components/common/LiveDeliveryMap";
 import { toastSuccess, toastError } from "@/utils/toast";
 
 const DeliveryOrders = () => {
@@ -39,6 +41,17 @@ const DeliveryOrders = () => {
   const [cashCollected, setCashCollected] = useState<number>(0);
   const [deliveryNotes, setDeliveryNotes] = useState<string>("");
   const [completing, setCompleting] = useState(false);
+
+  const activeTask = deliveries.find(
+    (d) =>
+      d.delivery_status === "out_for_delivery",
+  );
+
+  const { isWatching, currentLocation } = useLiveLocationTracker({
+    isTrackingActive: !!activeTask,
+    deliveryId: activeTask?._id,
+    orderId: activeTask?.order?._id,
+  });
 
   const fetchActiveDeliveries = useCallback(async (params = filters) => {
     try {
@@ -165,9 +178,17 @@ const DeliveryOrders = () => {
               Your assigned pickup and delivery tasks for execution.
             </p>
           </div>
-          <span className="px-3 py-1 rounded-[5px] bg-brand/10 text-brand border border-brand/20 font-bold text-xs">
-            {pagination.totalItems} Tasks Pending
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            {isWatching && (
+              <span className="px-3 py-1 rounded-[5px] bg-green-50 text-green-700 border border-green-200 font-bold text-xs flex items-center gap-1.5 shadow-2xs">
+                <span className="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping inline-block" />
+                Live GPS Broadcast Active
+              </span>
+            )}
+            <span className="px-3 py-1 rounded-[5px] bg-brand/10 text-brand border border-brand/20 font-bold text-xs">
+              {pagination.totalItems} Tasks Pending
+            </span>
+          </div>
         </div>
 
         {/* Filter Bar */}
@@ -266,19 +287,50 @@ const DeliveryOrders = () => {
                       </span>
                       <div className="flex items-start gap-2 text-gray-700">
                         <FiMapPin className="w-4 h-4 text-brand shrink-0 mt-0.5" />
-                        <span>{order?.address || "Address details missing"}</span>
+                        <span>{order?.deliveryLocation?.address || "Address details missing"}</span>
                       </div>
-                      <a
-                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                          order?.address || "",
-                        )}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline font-semibold mt-1"
-                      >
-                        <FiNavigation className="w-3.5 h-3.5" />
-                        <span>Open in Google Maps</span>
-                      </a>
+                      {order?.deliveryLocation?.latitude &&
+                        order?.deliveryLocation?.longitude && (
+                          <a
+                            href={
+                              currentLocation?.latitude != null &&
+                              currentLocation?.longitude != null
+                                ? `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${encodeURIComponent(
+                                    `${currentLocation.latitude},${currentLocation.longitude};${order.deliveryLocation.latitude},${order.deliveryLocation.longitude}`,
+                                  )}`
+                                : order?.deliveryTracking?.latitude != null &&
+                                  order?.deliveryTracking?.longitude != null
+                                  ? `https://www.openstreetmap.org/directions?engine=fossgis_osrm_car&route=${encodeURIComponent(
+                                      `${order.deliveryTracking.latitude},${order.deliveryTracking.longitude};${order.deliveryLocation.latitude},${order.deliveryLocation.longitude}`,
+                                    )}`
+                                  : `https://www.openstreetmap.org/?mlat=${order.deliveryLocation.latitude}&mlon=${order.deliveryLocation.longitude}#map=15/${order.deliveryLocation.latitude}/${order.deliveryLocation.longitude}`
+                            }
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1.5 text-xs text-brand hover:underline font-semibold mt-1"
+                          >
+                            <FiNavigation className="w-3.5 h-3.5" />
+                            <span>Open in OpenStreetMap</span>
+                          </a>
+                        )}
+
+                      {/* Live Leaflet Real-time Map View */}
+                      <div className="mt-3">
+                        <LiveDeliveryMap
+                          orderId={order?._id}
+                          destinationCoords={
+                            order?.deliveryLocation?.latitude &&
+                            order?.deliveryLocation?.longitude
+                              ? {
+                                  lat: order.deliveryLocation.latitude,
+                                  lng: order.deliveryLocation.longitude,
+                                }
+                              : undefined
+                          }
+                          destinationAddress={order?.deliveryLocation?.address}
+                          height="240px"
+                        />
+                      </div>
                     </div>
                   </div>
 

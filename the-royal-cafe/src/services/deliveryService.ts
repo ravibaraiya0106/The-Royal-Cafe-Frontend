@@ -11,7 +11,18 @@ export type DeliveryItem = {
     payment_method: string;
     payment_status: string;
     order_status: string;
-    address: string;
+    deliveryLocation?: {
+      address: string;
+      latitude: number;
+      longitude: number;
+    };
+    deliveryTracking?: {
+      driverId?: string;
+      latitude: number | null;
+      longitude: number | null;
+      lastUpdatedAt?: string;
+      isOnline?: boolean;
+    };
     phone: string;
     notes?: string;
     createdAt: string;

@@ -14,7 +14,7 @@ const ContactMapSection = () => {
 
       <div className="mt-8 rounded-2xl overflow-hidden shadow-lg">
         <iframe
-          src="https://maps.google.com/maps?q=Ahmedabad&t=&z=13&ie=UTF8&iwloc=&output=embed"
+          src="https://www.openstreetmap.org/export/embed.html?bbox=72.4700%2C23.0100%2C72.6500%2C23.1100&layer=mapnik&marker=23.0400%2C72.5600"
           className="w-full h-[400px]"
         />
       </div>
