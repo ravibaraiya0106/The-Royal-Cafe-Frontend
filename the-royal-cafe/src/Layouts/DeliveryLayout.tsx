@@ -7,6 +7,7 @@ import {
   FiUser,
   FiLogOut,
   FiPower,
+  FiMenu,
   FiChevronsLeft,
   FiChevronsRight,
 } from "react-icons/fi";
@@ -27,6 +28,7 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
   const user = getUser();
 
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean>(true);
   const [toggling, setToggling] = useState(false);
 
@@ -60,11 +62,19 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
 
   return (
     <div className="min-h-screen bg-white flex font-sans text-gray-800">
+      {/* Mobile overlay */}
+      {mobileNavOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+
       {/* Fixed Admin-Style Left Sidebar */}
       <aside
         className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-40 transition-all duration-300 ${
           collapsed ? "w-20" : "w-64"
-        }`}
+        } ${mobileNavOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
       >
         {/* Logo Section */}
         <div className="h-16 flex items-center border-b px-4 justify-between">
@@ -145,12 +155,20 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
       {/* Main Layout Area */}
       <div
         className={`w-full min-h-screen transition-all duration-300 flex flex-col ${
-          collapsed ? "ml-20" : "ml-64"
-        }`}
+          collapsed ? "lg:ml-20" : "lg:ml-64"
+        } ml-0`}
       >
         {/* Top Navbar */}
         <header className="bg-white border-b border-gray-200 h-16 sticky top-0 z-30 px-6 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(true)}
+              className="lg:hidden p-2 rounded-lg bg-white border border-gray-200 shadow-sm text-gray-700"
+              aria-label="Open delivery menu"
+            >
+              <FiMenu className="w-5 h-5" />
+            </button>
             <span className="text-xs font-semibold uppercase tracking-wider text-brand bg-brand/10 px-3 py-1 rounded-full border border-brand/20">
               Delivery Portal
             </span>

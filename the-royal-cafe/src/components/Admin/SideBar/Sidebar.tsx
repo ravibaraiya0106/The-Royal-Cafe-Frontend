@@ -1,4 +1,4 @@
-import { FiChevronsLeft, FiChevronsRight, FiLogOut } from "react-icons/fi";
+import { FiChevronsLeft, FiChevronsRight, FiLogOut, FiX } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 
 import SidebarItem from "./SidebarItem";
@@ -14,9 +14,13 @@ import { logoutService } from "@/services/authService";
 const Sidebar = ({
   collapsed,
   onToggle,
+  isMobileOpen,
+  onMobileClose,
 }: {
   collapsed: boolean;
   onToggle: () => void;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 }) => {
   const navigate = useNavigate();
 
@@ -41,7 +45,7 @@ const Sidebar = ({
     <aside
       className={`fixed top-0 left-0 h-screen bg-white border-r border-gray-200 z-40 transition-all duration-300 ${
         collapsed ? "w-20" : "w-64"
-      }`}
+      } ${isMobileOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}
     >
       {/* Logo */}
       <div className="h-16 flex items-center border-b px-4 justify-between">
@@ -66,6 +70,16 @@ const Sidebar = ({
           )}
         </button>
       </div>
+
+        {/* Mobile Close */}
+        <button
+          type="button"
+          onClick={onMobileClose}
+          className="lg:hidden absolute top-4 right-4 w-9 h-9 rounded-full bg-white border border-gray-200 shadow-sm text-gray-700"
+          aria-label="Close menu"
+        >
+          <FiX className="w-5 h-5 mx-auto" />
+        </button>
 
       {/* Menu */}
       <nav className={`p-4 space-y-2 ${collapsed ? "pt-3" : ""}`}>
