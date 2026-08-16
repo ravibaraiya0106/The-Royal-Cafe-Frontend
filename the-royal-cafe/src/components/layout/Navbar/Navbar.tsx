@@ -20,6 +20,7 @@ import { PrimaryButton } from "@/components/common/form/Button.tsx";
 // MODALS
 import LoginModal from "@/components/auth/LoginModal.tsx";
 import RegisterModal from "@/components/auth/RegisterModal.tsx";
+import ForgotPasswordModal from "@/components/auth/ForgotPasswordModal.tsx";
 import { getUser } from "@/utils/storage";
 
 const Navbar = () => {
@@ -29,6 +30,7 @@ const Navbar = () => {
   // AUTH MODAL STATE
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [forgotPasswordOpen, setForgotPasswordOpen] = useState(false);
 
   const profileMenuId = useId();
   const profileButtonRef = useRef<HTMLButtonElement | null>(null);
@@ -194,6 +196,10 @@ const Navbar = () => {
           setLoginOpen(false);
           setRegisterOpen(true);
         }}
+        onOpenForgotPassword={() => {
+          setLoginOpen(false);
+          setForgotPasswordOpen(true);
+        }}
       />
 
       {/* REGISTER MODAL */}
@@ -202,6 +208,16 @@ const Navbar = () => {
         onClose={() => setRegisterOpen(false)}
         onSwitchToLogin={() => {
           setRegisterOpen(false);
+          setLoginOpen(true);
+        }}
+      />
+
+      {/* FORGOT PASSWORD MODAL */}
+      <ForgotPasswordModal
+        open={forgotPasswordOpen}
+        onClose={() => setForgotPasswordOpen(false)}
+        onSwitchToLogin={() => {
+          setForgotPasswordOpen(false);
           setLoginOpen(true);
         }}
       />

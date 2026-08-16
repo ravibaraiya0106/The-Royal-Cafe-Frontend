@@ -22,6 +22,8 @@ import DeliveryOrders from "@/pages/Delivery/DeliveryOrders";
 import DeliveryHistory from "@/pages/Delivery/DeliveryHistory";
 import DeliveryProfile from "@/pages/Delivery/DeliveryProfile";
 
+import ResetPassword from "@/pages/auth/ResetPassword";
+
 const AppRoutes = () => {
   return (
     <BrowserRouter>
@@ -53,6 +55,7 @@ const AppRoutes = () => {
           }
         />
         <Route path={ROUTES.REVIEWS} element={<Reviews />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         {/* Delivery Boy Portal Routes */}
         <Route path={ROUTES.DELIVERY_LOGIN} element={<DeliveryLogin />} />

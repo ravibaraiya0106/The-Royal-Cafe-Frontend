@@ -54,11 +54,15 @@ const ItemCard = ({ item }: { item: Item }) => {
           {item.name}
         </h5>
 
-        {/* DESCRIPTION */}
-        {item.description && (
-          <p className="text-gray-600 mb-4 text-sm line-clamp-2">
-            {item.description}
-          </p>
+        {/* PRICE */}
+        {typeof item.price === "number" && (
+          <div className="mb-4 text-lg font-bold text-brand">
+            {new Intl.NumberFormat("en-IN", {
+              style: "currency",
+              currency: "INR",
+              maximumFractionDigits: 0,
+            }).format(item.price)}
+          </div>
         )}
 
         {/* CART */}

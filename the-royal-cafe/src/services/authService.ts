@@ -91,3 +91,25 @@ export const resetPasswordService = async (
 
   return message as string;
 };
+
+/* ================= FORGOT PASSWORD ================= */
+export const forgotPasswordService = async (email: string): Promise<string> => {
+  const res = await postRequest(ENDPOINTS.AUTH.FORGOT_PASSWORD, { email });
+  const { success, message } = res.data;
+  if (!success) throw new Error(message || "Failed to send reset link");
+  return message as string;
+};
+
+/* ================= CONFIRM RESET PASSWORD ================= */
+export const confirmResetPasswordService = async (
+  token: string,
+  new_password: string,
+): Promise<string> => {
+  const res = await postRequest(ENDPOINTS.AUTH.CONFIRM_RESET_PASSWORD, {
+    token,
+    new_password,
+  });
+  const { success, message } = res.data;
+  if (!success) throw new Error(message || "Failed to reset password");
+  return message as string;
+};

@@ -14,10 +14,7 @@ const getContactQuery = () => {
   return email ? `&email=${encodeURIComponent(String(email))}` : "";
 };
 
-export const reverseGeocode = async (
-  latitude: number,
-  longitude: number,
-) => {
+export const reverseGeocode = async (latitude: number, longitude: number) => {
   const url = `${NOMINATIM_BASE_URL}/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1${getContactQuery()}`;
 
   const res = await fetch(url);
@@ -26,29 +23,53 @@ export const reverseGeocode = async (
   const data = await res.json();
 
   if (data && typeof data === "object" && "error" in data) {
-    throw new Error(String((data as { error?: string }).error || "Reverse geocode failed"));
+    throw new Error(
+      String((data as { error?: string }).error || "Reverse geocode failed"),
+    );
   }
 
   const a = data?.address;
   if (!a) {
-    return { address: data?.display_name || `${latitude}, ${longitude}`, raw: data };
+    return {
+      address: data?.display_name || `${latitude}, ${longitude}`,
+      raw: data,
+    };
   }
 
   const specific =
     a.house_number || a.building || a.amenity || a.office || a.shop || "";
-  const street = a.road || a.street || a.pedestrian || a.footway || a.path || "";
+  const street =
+    a.road || a.street || a.pedestrian || a.footway || a.path || "";
   const area =
-    a.residential || a.suburb || a.neighbourhood || a.quarter || a.subdistrict || a.hamlet || "";
+    a.residential ||
+    a.suburb ||
+    a.neighbourhood ||
+    a.quarter ||
+    a.subdistrict ||
+    a.hamlet ||
+    "";
   const city =
-    a.city || a.town || a.village || a.municipality || a.district || a.county || "";
+    a.city ||
+    a.town ||
+    a.village ||
+    a.municipality ||
+    a.district ||
+    a.county ||
+    "";
   const state = a.state || "";
   const postcode = a.postcode || "";
   const country = a.country || "";
 
-  const parts = [specific, street, area, city, state, postcode, country].filter(Boolean);
-  const uniqueParts = parts.filter((item: string, idx: number) => parts.indexOf(item) === idx);
+  const parts = [specific, street, area, city, state, postcode, country].filter(
+    Boolean,
+  );
+  const uniqueParts = parts.filter(
+    (item: string, idx: number) => parts.indexOf(item) === idx,
+  );
   const formatted =
-    uniqueParts.length > 0 ? uniqueParts.join(", ") : data?.display_name || `${latitude}, ${longitude}`;
+    uniqueParts.length > 0
+      ? uniqueParts.join(", ")
+      : data?.display_name || `${latitude}, ${longitude}`;
 
   return { address: formatted, raw: data };
 };
@@ -71,4 +92,3 @@ export const geocodeAddress = async (address: string) => {
 
   return { latitude: lat, longitude: lon, raw: data };
 };
-

@@ -33,7 +33,7 @@ const Cart = () => {
   }, [items]);
 
   const formatMoney = (value: number) => {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,

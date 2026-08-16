@@ -16,9 +16,15 @@ type Props = {
   open: boolean;
   onClose: () => void;
   onSwitchToRegister?: () => void;
+  onOpenForgotPassword?: () => void;
 };
 
-const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
+const LoginModal = ({
+  open,
+  onClose,
+  onSwitchToRegister,
+  onOpenForgotPassword,
+}: Props) => {
 
   const [form, setForm] = useState({
     username: "",
@@ -128,7 +134,13 @@ const LoginModal = ({ open, onClose, onSwitchToRegister }: Props) => {
           </Box>
 
           <div className="flex justify-end mt-2">
-            <span className="text-sm text-brand cursor-pointer hover:underline w-full text-center">
+            <span
+              className="text-sm text-brand cursor-pointer hover:underline w-full text-center"
+              onClick={() => {
+                onClose();
+                onOpenForgotPassword?.();
+              }}
+            >
               Forgot password?
             </span>
           </div>

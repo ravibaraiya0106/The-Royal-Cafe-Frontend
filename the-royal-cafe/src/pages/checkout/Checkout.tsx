@@ -11,26 +11,26 @@ import { DangerButton, PrimaryButton } from "@/components/common/form/Button";
 import { toastError, toastSuccess } from "@/utils/toast";
 import LoginModal from "@/components/auth/LoginModal";
 import { ENDPOINTS } from "@/api/endpoints";
-import { postRequest } from "@/services/apiService";
+import { deleteRequest, postRequest } from "@/services/apiService";
 import { getAvailableCoupons } from "@/services/couponsService";
 import { getToken, getUser } from "@/utils/storage";
 import SelectCouponModal from "@/components/common/modals/SelectCouponModal";
 import MapLocationPicker from "@/components/checkout/MapLocationPicker";
+import UpiPaymentModal from "@/components/checkout/UpiPaymentModal";
 
 type CheckoutForm = {
   phone: string;
   address: string;
   latitude?: number;
   longitude?: number;
-  paymentMethod: "COD" | "UPI" | "CARD";
+  paymentMethod: "COD" | "UPI";
   notes?: string;
   couponCode?: string;
 };
 
 const paymentOptions = [
   { label: "Cash on Delivery (COD)", value: "COD" },
-  { label: "UPI", value: "UPI" },
-  { label: "Card", value: "CARD" },
+  { label: "UPI (Google Pay / PhonePe / Paytm / QR Code / UPI ID)", value: "UPI" },
 ];
 
 const Checkout = () => {
@@ -45,6 +45,7 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [upiModalOpen, setUpiModalOpen] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [couponModalOpen, setCouponModalOpen] = useState(false);
@@ -161,7 +162,7 @@ const Checkout = () => {
   }, [form.couponCode, hasPrices, subtotal]);
 
   const formatMoney = (value: number) => {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
       maximumFractionDigits: 0,
@@ -211,14 +212,15 @@ const Checkout = () => {
     [],
   );
 
-  const placeOrder = useCallback(async () => {
-    if (items.length === 0) return;
-    if (!validate()) return;
+  const createOrderRequest = useCallback(
+    async (paymentMethod: "COD" | "UPI", upiUtr?: string) => {
+      // 1) Clear stale DB cart items and sync current local cart into backend cart
+      try {
+        await deleteRequest(ENDPOINTS.CART.CLEAR);
+      } catch {
+        // ignore if cart was empty
+      }
 
-    try {
-      setLoading(true);
-
-      // 1) Sync local cart into backend cart for the logged-in user
       await Promise.all(
         items.map(async (it) => {
           const res = await postRequest(ENDPOINTS.CART.CREATE, {
@@ -241,7 +243,8 @@ const Checkout = () => {
         latitude: form.latitude,
         longitude: form.longitude,
         phone: form.phone,
-        payment_method: form.paymentMethod,
+        payment_method: paymentMethod,
+        upi_utr: upiUtr || "",
         notes: form.notes || "",
         coupon_code: form.couponCode || "",
       });
@@ -251,6 +254,7 @@ const Checkout = () => {
         message: string;
         responseData: {
           order?: {
+            _id?: string;
             order_number?: string;
             final_amount?: number;
             discount_amount?: number;
@@ -258,30 +262,67 @@ const Checkout = () => {
         };
       };
 
-      if (!success) throw new Error(message || "Failed to create order");
-      const nextOrderNumber = responseData?.order?.order_number ?? "";
-      const nextFinalAmount = responseData?.order?.final_amount ?? 0;
+      if (!success || !responseData?.order?._id) {
+        throw new Error(message || "Failed to create order");
+      }
+
+      const nextOrderNumber = responseData.order.order_number ?? "";
+      const nextFinalAmount = responseData.order.final_amount ?? 0;
 
       setOrderId(nextOrderNumber);
       setFinalAmount(nextFinalAmount);
       clearCart();
       setSuccess(true);
       toastSuccess(message);
+    },
+    [
+      clearCart,
+      form.address,
+      form.couponCode,
+      form.latitude,
+      form.longitude,
+      form.notes,
+      form.phone,
+      items,
+    ],
+  );
+
+  const placeOrder = useCallback(async () => {
+    if (items.length === 0) return;
+    if (!validate()) return;
+
+    if (form.paymentMethod === "UPI") {
+      setUpiModalOpen(true);
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await createOrderRequest("COD");
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Failed to place order");
     } finally {
       setLoading(false);
     }
-  }, [
-    clearCart,
-    items,
-    form.address,
-    form.phone,
-    form.paymentMethod,
-    form.couponCode,
-    form.notes,
-    validate,
-  ]);
+  }, [createOrderRequest, form.paymentMethod, items.length, validate]);
+
+  const handleConfirmUpiPayment = useCallback(
+    async (utr: string) => {
+      try {
+        setLoading(true);
+        await createOrderRequest("UPI", utr);
+        setUpiModalOpen(false);
+      } catch (err: unknown) {
+        toastError(
+          err instanceof Error ? err.message : "Failed to confirm UPI payment",
+        );
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [createOrderRequest],
+  );
 
   if (success) {
     return (
@@ -373,6 +414,14 @@ const Checkout = () => {
           }));
           toastSuccess(`Coupon applied: ${code}`);
         }}
+      />
+
+      <UpiPaymentModal
+        open={upiModalOpen}
+        onClose={() => setUpiModalOpen(false)}
+        amount={hasPrices ? totalAfterDiscount : subtotal}
+        onSubmitUtr={handleConfirmUpiPayment}
+        loading={loading}
       />
 
       <div className="mt-10 mb-10 px-4 max-w-screen-xl mx-auto">

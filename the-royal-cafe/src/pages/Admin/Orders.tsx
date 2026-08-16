@@ -3,7 +3,7 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
 import dayjs from "dayjs";
-import { adminOrdersList } from "@/services/orderService";
+import { adminOrdersList, updatePaymentStatusService } from "@/services/orderService";
 import { deliveryPersonList } from "@/services/deliveryPersonsService";
 import { assignDeliveryService } from "@/services/deliveryService";
 import { toastSuccess, toastError } from "@/utils/toast";
@@ -15,11 +15,21 @@ import { FiTruck } from "react-icons/fi";
 type AdminOrder = {
   _id: string;
   order_number: string;
-  user: string;
+  user?:
+    | {
+        _id: string;
+        username?: string;
+        first_name?: string;
+        last_name?: string;
+        email?: string;
+        phone?: string;
+      }
+    | string;
   final_amount: number;
   payment_method: string;
   payment_status: string;
   order_status: string;
+  upi_utr?: string;
   createdAt: string;
   address: string;
   phone: string;
@@ -46,7 +56,7 @@ type DeliveryPersonOption = {
 const Orders = () => {
   const formatMoney = useMemo(() => {
     return (value: number) =>
-      new Intl.NumberFormat(undefined, {
+      new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 0,
@@ -169,6 +179,18 @@ const Orders = () => {
     }
   };
 
+  const handleMarkPaid = async (orderId: string) => {
+    try {
+      await updatePaymentStatusService(orderId, "paid");
+      toastSuccess("Payment status updated to Paid!");
+      fetchOrders();
+    } catch (err: unknown) {
+      toastError(
+        err instanceof Error ? err.message : "Failed to update payment status",
+      );
+    }
+  };
+
   const statusChip = (status?: string) => {
     const value = status?.toLowerCase();
     if (value === "delivered") return "bg-green-100 text-green-700 border-green-200";
@@ -184,13 +206,33 @@ const Orders = () => {
       render: (row) => <span className="font-mono font-semibold">{row.order_number}</span>,
     },
     {
-      header: "User",
+      header: "Customer",
       accessor: "user",
-      render: (row) => (
-        <span className="text-xs text-gray-600 font-mono truncate max-w-[120px] inline-block">
-          {row.user}
-        </span>
-      ),
+      render: (row) => {
+        if (typeof row.user === "object" && row.user !== null) {
+          const name =
+            `${row.user.first_name || ""} ${row.user.last_name || ""}`.trim() ||
+            row.user.username ||
+            "Customer";
+          return (
+            <div className="flex flex-col">
+              <span className="font-semibold text-gray-900 text-xs truncate max-w-[130px]">
+                {name}
+              </span>
+              {row.user.email && (
+                <span className="text-[11px] text-gray-500 font-mono truncate max-w-[130px]">
+                  {row.user.email}
+                </span>
+              )}
+            </div>
+          );
+        }
+        return (
+          <span className="text-xs text-gray-600 font-mono truncate max-w-[120px] inline-block">
+            {String(row.user || "-")}
+          </span>
+        );
+      },
     },
     {
       header: "Total",
@@ -202,10 +244,33 @@ const Orders = () => {
       header: "Payment",
       accessor: "payment_method",
       render: (row) => (
-        <span className="text-gray-800 text-xs font-medium">
-          {row.payment_method}{" "}
-          <span className="text-gray-500">({row.payment_status})</span>
-        </span>
+        <div className="flex flex-col gap-1 items-start">
+          <span className="text-gray-900 text-xs font-semibold">
+            {row.payment_method}{" "}
+            <span
+              className={
+                row.payment_status === "paid"
+                  ? "text-emerald-700 font-bold"
+                  : "text-amber-700 font-medium"
+              }
+            >
+              ({row.payment_status})
+            </span>
+          </span>
+          {row.upi_utr && (
+            <span className="text-[10px] font-mono text-brand bg-brand/5 px-1.5 py-0.5 rounded border border-brand/20 w-fit">
+              UTR: {row.upi_utr}
+            </span>
+          )}
+          {row.payment_status !== "paid" && (
+            <button
+              onClick={() => handleMarkPaid(row._id)}
+              className="text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-0.5 rounded transition shadow-2xs mt-0.5"
+            >
+              ✓ Mark Paid
+            </button>
+          )}
+        </div>
       ),
     },
     {
@@ -286,7 +351,6 @@ const Orders = () => {
         options: [
           { label: "COD", value: "COD" },
           { label: "UPI", value: "UPI" },
-          { label: "CARD", value: "CARD" },
         ],
       },
       {

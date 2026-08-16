@@ -75,7 +75,7 @@ const OrderHistory = () => {
 
   const formatMoney = useMemo(() => {
     return (value: number) =>
-      new Intl.NumberFormat(undefined, {
+      new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
         maximumFractionDigits: 0,

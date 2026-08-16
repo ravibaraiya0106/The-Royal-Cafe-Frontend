@@ -4,6 +4,8 @@ export const ENDPOINTS = {
     REGISTER: "/auth/register",
     LOGOUT: "/auth/logout",
     RESET_PASSWORD: "/auth/reset-password",
+    FORGOT_PASSWORD: "/auth/forgot-password",
+    CONFIRM_RESET_PASSWORD: "/auth/confirm-reset-password",
   },
   ITEMS: {
     GET_ALL: "/product/list",
@@ -65,6 +67,7 @@ export const ENDPOINTS = {
   },
   CART: {
     CREATE: "/cart/create",
+    CLEAR: "/cart/clear",
   },
   ORDER: {
     CREATE: "/order/create",
@@ -72,6 +75,7 @@ export const ENDPOINTS = {
     DETAILS: (id: string) => `/order/details/${id}`,
     ADMIN_LIST: "/order/admin/list",
     ADMIN_ANALYTICS: "/order/admin/analytics",
+    UPDATE_PAYMENT_STATUS: (id: string) => `/order/update-payment-status/${id}`,
   },
   DELIVERY: {
     ASSIGN: "/delivery/assign",

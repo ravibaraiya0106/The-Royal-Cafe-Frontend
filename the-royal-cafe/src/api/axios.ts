@@ -19,15 +19,25 @@ API.interceptors.request.use((config) => {
 API.interceptors.response.use(
   (res) => res,
   (error) => {
-    if (error.response?.status === 401) {
+    const isAuthRoute = error.config?.url?.includes("/auth/");
+
+    if (error.response?.status === 401 && !isAuthRoute) {
       localStorage.removeItem("token");
-      window.location.href = "/";
+      localStorage.removeItem("user");
+      if (window.location.pathname !== "/") {
+        window.location.href = "/";
+      }
     }
 
     const resData = error.response?.data;
-    let backendMessage = resData?.message || error.message || "Something went wrong";
+    let backendMessage =
+      resData?.message || error.message || "Something went wrong";
 
-    if (resData?.errors && Array.isArray(resData.errors) && resData.errors.length > 0) {
+    if (
+      resData?.errors &&
+      Array.isArray(resData.errors) &&
+      resData.errors.length > 0
+    ) {
       backendMessage = resData.errors.join(", ");
     }
 
