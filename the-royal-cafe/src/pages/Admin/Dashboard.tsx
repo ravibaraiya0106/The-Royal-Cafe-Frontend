@@ -71,6 +71,15 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchDashboardStats();
+
+    const handleDashboardUpdate = () => {
+      fetchDashboardStats();
+    };
+
+    window.addEventListener("adminOrderUpdated", handleDashboardUpdate);
+    return () => {
+      window.removeEventListener("adminOrderUpdated", handleDashboardUpdate);
+    };
   }, [fetchDashboardStats]);
 
   const formatMoney = (val: number) =>
@@ -114,9 +123,9 @@ const Dashboard = () => {
               <span className="text-2xl font-bold text-gray-900 block mt-1">
                 {formatMoney(stats.totalRevenue)}
               </span>
-              <span className="inline-flex items-center text-[11px] font-semibold text-green-600 mt-1">
+              <span className="inline-flex items-center text-[11px] font-semibold text-emerald-600 mt-1">
                 <FiArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
-                Updated Realtime
+                Total Paid & Delivered Sales
               </span>
             </div>
             <div className="w-12 h-12 rounded-[5px] bg-brand/10 border border-brand/20 flex items-center justify-center text-brand">
@@ -133,9 +142,9 @@ const Dashboard = () => {
               <span className="text-2xl font-bold text-gray-900 block mt-1">
                 {stats.totalOrders}
               </span>
-              <span className="inline-flex items-center text-[11px] font-semibold text-green-600 mt-1">
-                <FiArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
-                Updated Realtime
+              <span className="inline-flex items-center text-[11px] font-semibold text-amber-700 mt-1">
+                <FiShoppingBag className="w-3.5 h-3.5 mr-0.5" />
+                Total Lifetime Orders Placed
               </span>
             </div>
             <div className="w-12 h-12 rounded-[5px] bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-700">
@@ -153,7 +162,7 @@ const Dashboard = () => {
                 {stats.onlineDeliveryPersons} / {stats.totalDeliveryPersons}
               </span>
               <span className="inline-flex items-center text-[11px] font-semibold text-blue-600 mt-1">
-                🛵 {stats.onlineDeliveryPersons} Online Available
+                🛵 {stats.onlineDeliveryPersons} Active & Available Staff
               </span>
             </div>
             <div className="w-12 h-12 rounded-[5px] bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700">
@@ -170,9 +179,9 @@ const Dashboard = () => {
               <span className="text-2xl font-bold text-gray-900 block mt-1">
                 {stats.totalCustomers}
               </span>
-              <span className="inline-flex items-center text-[11px] font-semibold text-green-600 mt-1">
-                <FiArrowUpRight className="w-3.5 h-3.5 mr-0.5" />
-                Registered Users
+              <span className="inline-flex items-center text-[11px] font-semibold text-purple-600 mt-1">
+                <FiUsers className="w-3.5 h-3.5 mr-0.5" />
+                Total Verified Customer Accounts
               </span>
             </div>
             <div className="w-12 h-12 rounded-[5px] bg-purple-50 border border-purple-200 flex items-center justify-center text-purple-700">

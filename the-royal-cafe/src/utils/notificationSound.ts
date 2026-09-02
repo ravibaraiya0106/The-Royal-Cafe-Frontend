@@ -1,11 +1,48 @@
+// Global voice cache & unlock flag
+let cachedVoices: SpeechSynthesisVoice[] = [];
+let audioUnlocked = false;
+
+// Preload voices as soon as browser loads them
+if (typeof window !== "undefined" && "speechSynthesis" in window) {
+  const loadVoices = () => {
+    cachedVoices = window.speechSynthesis.getVoices();
+  };
+  loadVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+  }
+
+  // Global user interaction unlock listener
+  const unlockAudio = () => {
+    if (audioUnlocked) return;
+    try {
+      window.speechSynthesis.resume();
+      audioUnlocked = true;
+      window.removeEventListener("click", unlockAudio);
+      window.removeEventListener("keydown", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+    } catch (e) {
+      console.log("Audio unlock:", e);
+    }
+  };
+
+  window.addEventListener("click", unlockAudio);
+  window.addEventListener("keydown", unlockAudio);
+  window.addEventListener("touchstart", unlockAudio);
+}
+
 /**
- * Voice Alert Helper using Web Speech API with Chrome autoplay safeguards
+ * Voice Alert Helper using Web Speech API with Chrome autoplay safeguards and audio chime fallback
  */
 export const speakVoiceAlert = (message: string) => {
   try {
+    // 1. Play audible chime first to guarantee instant audio feedback
+    playNewOrderChime();
+
+    // 2. Speak voice text
     if ("speechSynthesis" in window) {
       window.speechSynthesis.cancel(); // Stop any pending speech
-      window.speechSynthesis.resume(); // Resume if suspended by browser policy
+      window.speechSynthesis.resume(); // Unlock audio context if suspended by browser policy
 
       const utterance = new SpeechSynthesisUtterance(message);
       utterance.lang = "en-US";
@@ -13,10 +50,10 @@ export const speakVoiceAlert = (message: string) => {
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
 
-      const voices = window.speechSynthesis.getVoices();
+      const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
       if (voices.length > 0) {
         const preferredVoice =
-          voices.find((v) => v.lang.startsWith("en") && v.name.includes("Google")) ||
+          voices.find((v) => v.lang.startsWith("en") && (v.name.includes("Google") || v.name.includes("Natural"))) ||
           voices.find((v) => v.lang.startsWith("en"));
         if (preferredVoice) {
           utterance.voice = preferredVoice;
@@ -30,7 +67,7 @@ export const speakVoiceAlert = (message: string) => {
         if (window.speechSynthesis.paused || window.speechSynthesis.pending) {
           window.speechSynthesis.resume();
         }
-      }, 100);
+      }, 150);
     }
   } catch (err) {
     console.error("Speech synthesis error:", err);
