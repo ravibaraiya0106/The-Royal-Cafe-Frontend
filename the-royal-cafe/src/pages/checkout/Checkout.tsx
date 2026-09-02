@@ -41,7 +41,7 @@ const paymentOptions = [
   },
 ];
 
-import brandLogo from "@/assets/images/logo.png";
+import brandLogo from "@/assets/images/logo1.png";
 
 type RazorpaySuccessPayload = {
   razorpay_order_id: string;
