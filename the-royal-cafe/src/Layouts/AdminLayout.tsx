@@ -1,4 +1,4 @@
-import Sidebar from "../components/Admin/sidebar/Sidebar";
+import Sidebar from "../components/Admin/SideBar/Sidebar";
 
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";

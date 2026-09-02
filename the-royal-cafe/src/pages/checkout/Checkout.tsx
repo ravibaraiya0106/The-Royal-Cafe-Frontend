@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import { useCart } from "@/hooks/useCart";
 import InputField from "@/components/common/form/InputField";
 import TextAreaField from "@/components/common/form/TextAreaField";

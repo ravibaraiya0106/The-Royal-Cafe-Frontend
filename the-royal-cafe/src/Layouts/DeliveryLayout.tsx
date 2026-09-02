@@ -12,7 +12,7 @@ import {
   FiChevronsRight,
 } from "react-icons/fi";
 import { getUser, clearAuth } from "@/utils/storage";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import { toggleAvailabilityService } from "@/services/deliveryService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import logo from "@/assets/images/logo.png";

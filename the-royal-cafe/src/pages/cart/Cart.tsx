@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiMinus, FiPlus, FiTrash2 } from "react-icons/fi";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import { useCart } from "@/hooks/useCart";
 import {
   PrimaryButton,

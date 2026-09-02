@@ -17,6 +17,7 @@ import ConfirmDialog from "../../components/Admin/modals/ConfirmDialog";
 import Filter from "@/components/Admin/common/Filter";
 import ShowDetailsModal from "@/components/Admin/modals/ShowDetailsModal";
 import Pagination from "@/components/Admin/common/Pagination";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 type Category = {
   _id: string;
@@ -181,7 +182,7 @@ const Categories = () => {
       render: (row) =>
         row.image ? (
           <img
-            src={`${import.meta.env.VITE_FILE_URL}${row.image}`}
+            src={getImageUrl(row.image)}
             alt="Category"
             className="w-12 h-12 object-cover rounded-lg border"
           />
@@ -290,11 +291,7 @@ const Categories = () => {
         open={viewOpen}
         onClose={() => setViewOpen(false)}
         title="Category Details"
-        image={
-          viewData?.image
-            ? `${import.meta.env.VITE_FILE_URL}${viewData.image}`
-            : null
-        }
+        image={viewData?.image ? getImageUrl(viewData.image) : null}
         fields={[
           { label: "Name", value: viewData?.name },
           { label: "Description", value: viewData?.description },

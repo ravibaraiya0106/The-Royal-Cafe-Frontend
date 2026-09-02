@@ -24,7 +24,7 @@ import {
   getDeliveryAnalyticsService,
   type DeliveryItem,
 } from "@/services/deliveryService";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import { toastSuccess, toastError } from "@/utils/toast";
 
 const DeliveryDashboard = () => {

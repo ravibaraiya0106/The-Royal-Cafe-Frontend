@@ -14,7 +14,7 @@ import {
   getMyDeliveriesService,
   type DeliveryPersonProfile,
 } from "@/services/deliveryService";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 const DeliveryProfile = () => {
   const navigate = useNavigate();

@@ -1,7 +1,7 @@
 // components/contact/ContactMapSection.tsx
 
 import { Link } from "react-router-dom";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 const ContactMapSection = () => {
   return (

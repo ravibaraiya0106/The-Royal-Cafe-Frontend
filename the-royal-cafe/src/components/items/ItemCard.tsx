@@ -14,6 +14,8 @@ type Item = {
   category?: { id: number; name: string } | string;
 };
 
+import { getImageUrl } from "@/utils/getImageUrl";
+
 const ItemCard = ({ item }: { item: Item }) => {
   const { items: cartItems, addItem, decrementItem } = useCart();
   const cartItem = cartItems.find((it) => it.productId === item.id);
@@ -27,7 +29,7 @@ const ItemCard = ({ item }: { item: Item }) => {
       {/* IMAGE */}
       <img
         className="w-full h-48 object-cover"
-        src={item.image}
+        src={getImageUrl(item.image)}
         alt={item.name}
       />
 

@@ -3,7 +3,7 @@ import Footer from "@/components/layout/Footer/Footer";
 import Separator from "@/components/common/Seperator";
 import { getUser, logout } from "@/utils/storage";
 import { Navigate, useNavigate } from "react-router-dom";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import { useEffect, useState } from "react";
 
 import ProfileHero from "@/components/profile/ProfileHero";

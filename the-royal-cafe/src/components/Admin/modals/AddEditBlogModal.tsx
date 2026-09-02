@@ -11,6 +11,7 @@ import {
 
 import { FiX } from "react-icons/fi";
 import IconButton from "@mui/material/IconButton";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 type BlogData = {
   title?: string;
@@ -176,7 +177,7 @@ const AddEditBlogModal = ({ open, onClose, onSubmit, initialData }: Props) => {
                     <div className="flex flex-col items-center">
                       <p className="text-xs text-gray-500 mb-1">Current</p>
                       <img
-                        src={`${import.meta.env.VITE_FILE_URL}${form.existingImage}`}
+                        src={getImageUrl(form.existingImage)}
                         className="w-20 h-20 rounded-lg border object-cover"
                       />
                     </div>

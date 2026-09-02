@@ -6,6 +6,7 @@ import { getBlogById } from "@/services/blogsService";
 import { PrimaryButton } from "@/components/common/form/Button";
 import { FiArrowLeft, FiCalendar } from "react-icons/fi";
 import Badge from "@/components/common/badge/Badge";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 type Blog = {
   _id: string;
@@ -45,15 +46,6 @@ const BlogDetails = () => {
 
     fetchBlog();
   }, [id]);
-
-  /* ================= IMAGE HANDLER ================= */
-  const getImageUrl = (image?: string) => {
-    if (!image) return "/default.jpg"; // fallback image
-
-    if (image.startsWith("http")) return image;
-
-    return `${import.meta.env.VITE_FILE_URL}${image}`;
-  };
 
   return (
     <>

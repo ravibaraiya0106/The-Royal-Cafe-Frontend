@@ -1,4 +1,4 @@
-import { SOCIAL_LINKS } from "@/constants/Footer";
+import { SOCIAL_LINKS } from "@/constants/footer";
 import SocialIcon from "./SocialIcon";
 
 const FooterSocialIcons = () => {

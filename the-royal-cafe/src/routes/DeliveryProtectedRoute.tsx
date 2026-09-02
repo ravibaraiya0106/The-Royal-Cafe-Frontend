@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { getToken, getUser } from "@/utils/storage";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 const DeliveryProtectedRoute = ({ children }: { children: ReactNode }) => {
   const token = getToken();

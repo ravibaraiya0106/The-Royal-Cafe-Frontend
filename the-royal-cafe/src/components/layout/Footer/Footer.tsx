@@ -1,5 +1,5 @@
 import logo from "@/assets/images/logo1.png";
-import { QUICK_LINKS } from "@/constants/Navigation";
+import { QUICK_LINKS } from "@/constants/navigation";
 import FooterLink from "./FooterLink";
 import FooterSection from "./FooterSection";
 import FooterSocialIcons from "./FooterSocialIcons";

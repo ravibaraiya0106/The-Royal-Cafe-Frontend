@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { PrimaryButton } from "../common/form/Button";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 type Blog = {
   id: string;
@@ -18,7 +19,7 @@ const BlogCard = ({ blog }: { blog: Blog }) => {
       <div className="w-full md:w-60 h-60 md:h-60 flex-shrink-0 overflow-hidden">
         <img
           className="w-full h-full object-cover"
-          src={blog.image}
+          src={getImageUrl(blog.image)}
           alt={blog.title}
         />
       </div>

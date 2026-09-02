@@ -19,6 +19,7 @@ import Filter from "@/components/Admin/common/Filter";
 import ShowDetailsModal from "@/components/Admin/modals/ShowDetailsModal";
 import Pagination from "@/components/Admin/common/Pagination";
 import SpecialBadge from "@/components/common/badge/SpecialBadge";
+import { getImageUrl } from "@/utils/getImageUrl";
 
 type Item = {
   _id: string;
@@ -235,7 +236,7 @@ const Items = () => {
       render: (row) =>
         row.image ? (
           <img
-            src={`${import.meta.env.VITE_FILE_URL}${row.image}`}
+            src={getImageUrl(row.image)}
             alt="item"
             className="w-12 h-12 object-cover rounded-lg border"
           />
@@ -358,11 +359,7 @@ const Items = () => {
         open={viewOpen}
         onClose={() => setViewOpen(false)}
         title="Item Details"
-        image={
-          viewData?.image
-            ? `${import.meta.env.VITE_FILE_URL}${viewData.image}`
-            : null
-        }
+        image={viewData?.image ? getImageUrl(viewData.image) : null}
         fields={[
           { label: "Name", value: viewData?.name },
           { label: "Price", value: viewData?.price },

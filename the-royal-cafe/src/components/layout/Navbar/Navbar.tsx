@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from "react";
-import { NAV_ITEMS } from "@/constants/Navigation.ts";
+import { NAV_ITEMS } from "@/constants/navigation";
 import type { NavItemType } from "@/types/common";
 import logo from "@/assets/images/logo.png";
 import { Link } from "react-router-dom";
@@ -11,7 +11,7 @@ import MobileNav from "./MobileNav.tsx";
 import ProfileMenu from "./ProfileMenu.tsx";
 
 import { useClickOutside } from "@/hooks/useClickOutside";
-import { PROFILE_MENU_ITEMS } from "@/constants/ProfileMenu.ts";
+import { PROFILE_MENU_ITEMS } from "@/constants/profileMenu";
 import type { UserInfo } from "@/types/common";
 import { useCart } from "@/hooks/useCart";
 

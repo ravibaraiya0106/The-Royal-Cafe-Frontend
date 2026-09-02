@@ -1,4 +1,4 @@
-import { CONTACT_ITEMS } from "@/constants/Footer";
+import { CONTACT_ITEMS } from "@/constants/footer";
 
 const FooterContactItems = () => {
   return (

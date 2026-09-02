@@ -3,7 +3,7 @@ import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
 import Separator from "@/components/common/Seperator";
 import CafeCarousel from "@/components/home/CafeCarousel";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 const Home = () => {
   return (

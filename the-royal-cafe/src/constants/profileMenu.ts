@@ -2,7 +2,7 @@ import type { DropdownItem } from "@/types/common";
 import { logoutService } from "@/services/authService";
 import { toastSuccess } from "@/utils/toast";
 import { logout } from "@/utils/storage";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 export const user = {
   name: "Joseph McFall",

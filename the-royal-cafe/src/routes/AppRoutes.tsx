@@ -7,7 +7,7 @@ import Blog from "@/pages/blogs/Blogs";
 import BlogDetails from "@/pages/blogs/BlogDetails";
 import Items from "@/pages/items/Items";
 import { AdminRoutes } from "@/routes/AdminRoutes";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 import UserProfile from "@/pages/user/UserProfile";
 import OrderHistory from "@/pages/user/OrderHistory";
 import UserProtectedRoute from "@/routes/UserProtectedRoute";

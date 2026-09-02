@@ -9,7 +9,7 @@ import InputField from "@/components/common/form/InputField";
 import { PrimaryButton } from "@/components/common/form/Button";
 import { confirmResetPasswordService } from "@/services/authService";
 import { toastSuccess, toastError } from "@/utils/toast";
-import { ROUTES } from "@/constants/Navigation";
+import { ROUTES } from "@/constants/navigation";
 
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
