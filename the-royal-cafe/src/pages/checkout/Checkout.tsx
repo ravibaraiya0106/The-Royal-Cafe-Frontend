@@ -41,8 +41,7 @@ const paymentOptions = [
   },
 ];
 
-const CAFE_NAME = "The Royal Cafe";
-const CAFE_LOGO = "/icon.ico";
+import brandLogo from "@/assets/images/logo.png";
 
 type RazorpaySuccessPayload = {
   razorpay_order_id: string;
@@ -354,13 +353,29 @@ const Checkout = () => {
         prefill.name = currentUser.first_name || currentUser.username || "";
       }
 
+      let brandLogoUrl = brandLogo;
+      try {
+        const logoRes = await fetch(brandLogo);
+        const logoBlob = await logoRes.blob();
+        brandLogoUrl = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string) || brandLogo);
+          reader.onerror = () => resolve(brandLogo);
+          reader.readAsDataURL(logoBlob);
+        });
+      } catch {
+        brandLogoUrl = brandLogo.startsWith("http")
+          ? brandLogo
+          : `${window.location.origin}${brandLogo}`;
+      }
+
       const options: Record<string, unknown> = {
         key: keyId,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency || "INR",
-        name: CAFE_NAME,
-        description: `${CAFE_NAME} Order Payment`,
-        image: CAFE_LOGO,
+        name: "The Royal Cafe",
+        description: "The Royal Cafe Order Payment",
+        image: brandLogoUrl,
         order_id: razorpayOrder.id,
         handler: async function (response: Record<string, string>) {
           try {
