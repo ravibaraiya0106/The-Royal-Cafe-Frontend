@@ -3,6 +3,7 @@ import Dashboard from "@/pages/Admin/Dashboard";
 import Items from "@/pages/Admin/Items";
 import Categories from "@/pages/Admin/Categories";
 import Orders from "@/pages/Admin/Orders";
+import CancelledOrders from "@/pages/Admin/CancelledOrders";
 import Customers from "@/pages/Admin/Customers";
 import Blogs from "@/pages/Admin/Blogs";
 import Contact from "@/pages/Admin/Contact";
@@ -19,6 +20,7 @@ export const ADMIN_ROUTE_CONFIG = [
   { path: ROUTES.ADMIN_ITEMS, element: React.createElement(Items) },
   { path: ROUTES.ADMIN_CATEGORIES, element: React.createElement(Categories) },
   { path: ROUTES.ADMIN_ORDERS, element: React.createElement(Orders) },
+  { path: ROUTES.ADMIN_CANCELLED_ORDERS, element: React.createElement(CancelledOrders) },
   { path: ROUTES.ADMIN_CUSTOMERS, element: React.createElement(Customers) },
   { path: ROUTES.ADMIN_DELIVERY, element: React.createElement(DeliveryPerson) },
   { path: ROUTES.ADMIN_BLOGS, element: React.createElement(Blogs) },

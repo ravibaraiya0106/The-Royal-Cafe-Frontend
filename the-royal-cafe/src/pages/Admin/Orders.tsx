@@ -3,14 +3,15 @@ import AdminLayout from "@/Layouts/AdminLayout";
 import Table from "../../components/Admin/common/table";
 import type { Column } from "../../components/Admin/common/table";
 import dayjs from "dayjs";
-import { adminOrdersList, updatePaymentStatusService } from "@/services/orderService";
+import { adminOrdersList, updatePaymentStatusService, cancelOrderService } from "@/services/orderService";
 import { deliveryPersonList } from "@/services/deliveryPersonsService";
 import { assignDeliveryService } from "@/services/deliveryService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import Pagination from "@/components/Admin/common/Pagination";
 import Filter from "@/components/Admin/common/Filter";
 import AssignDeliveryModal from "@/components/Admin/modals/AssignDeliveryModal";
-import { FiTruck } from "react-icons/fi";
+import CancelOrderModal from "@/components/orders/CancelOrderModal";
+import { FiTruck, FiXCircle } from "react-icons/fi";
 
 type AdminOrder = {
   _id: string;
@@ -87,6 +88,27 @@ const Orders = () => {
   const [deliveryStaffList, setDeliveryStaffList] = useState<DeliveryPersonOption[]>([]);
   const [selectedStaffId, setSelectedStaffId] = useState<string>("");
   const [assignLoading, setAssignLoading] = useState(false);
+
+  /* Modal state for cancelling order */
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [selectedCancelOrder, setSelectedCancelOrder] = useState<AdminOrder | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelOrder = async (reason: string) => {
+    if (!selectedCancelOrder) return;
+    try {
+      setCancelling(true);
+      const res = await cancelOrderService(selectedCancelOrder._id, reason);
+      toastSuccess(res.message || "Order cancelled successfully");
+      setCancelModalOpen(false);
+      setSelectedCancelOrder(null);
+      fetchOrders();
+    } catch (err: unknown) {
+      toastError(err instanceof Error ? err.message : "Failed to cancel order");
+    } finally {
+      setCancelling(false);
+    }
+  };
 
   const fetchOrders = useCallback(async (params = filters) => {
     try {
@@ -340,6 +362,29 @@ const Orders = () => {
         );
       },
     },
+    {
+      header: "Action",
+      accessor: "_id",
+      align: "center",
+      render: (row) => (
+        <div>
+          {row.order_status !== "cancelled" && row.order_status !== "delivered" ? (
+            <button
+              onClick={() => {
+                setSelectedCancelOrder(row);
+                setCancelModalOpen(true);
+              }}
+              className="inline-flex items-center gap-1 text-xs font-semibold text-red-600 border border-red-200 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-lg transition-all shadow-2xs"
+            >
+              <FiXCircle size={13} />
+              <span>Cancel</span>
+            </button>
+          ) : (
+            <span className="text-[11px] text-gray-400 font-medium">N/A</span>
+          )}
+        </div>
+      ),
+    },
   ];
 
   const filterFields = useMemo(
@@ -411,6 +456,17 @@ const Orders = () => {
         onSelectStaff={(id) => setSelectedStaffId(id)}
         onSubmit={handleAssignSubmit}
         loading={assignLoading}
+      />
+
+      <CancelOrderModal
+        open={cancelModalOpen}
+        orderNumber={selectedCancelOrder?.order_number}
+        loading={cancelling}
+        onClose={() => {
+          setCancelModalOpen(false);
+          setSelectedCancelOrder(null);
+        }}
+        onConfirm={handleCancelOrder}
       />
     </AdminLayout>
   );

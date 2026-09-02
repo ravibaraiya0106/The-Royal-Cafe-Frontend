@@ -7,9 +7,10 @@ type Props = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   error?: string; // added
   row?: number; // added
+  placeholder?: string;
 };
 
-const TextAreaField = ({ label, name, value, onChange, error, row }: Props) => {
+const TextAreaField = ({ label, name, value, onChange, error, row, placeholder }: Props) => {
   return (
     <TextField
       fullWidth
@@ -20,6 +21,7 @@ const TextAreaField = ({ label, name, value, onChange, error, row }: Props) => {
       name={name}
       value={value}
       onChange={onChange}
+      placeholder={placeholder}
       margin="normal"
       error={!!error}
       helperText={error}

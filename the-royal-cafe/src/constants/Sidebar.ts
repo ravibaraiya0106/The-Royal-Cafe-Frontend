@@ -8,6 +8,7 @@ import {
   FiMessageSquare,
   FiTruck,
   FiLayers,
+  FiXCircle,
 } from "react-icons/fi";
 
 /* ================= ROUTES ================= */
@@ -20,6 +21,7 @@ export const ROUTES = {
   ADMIN_ITEMS: "/admin/items",
   ADMIN_CATEGORIES: "/admin/categories",
   ADMIN_ORDERS: "/admin/orders",
+  ADMIN_CANCELLED_ORDERS: "/admin/cancelled-orders",
   ADMIN_CUSTOMERS: "/admin/customers",
   ADMIN_BLOGS: "/admin/blogs",
   ADMIN_CONTACT: "/admin/contact",
@@ -55,6 +57,11 @@ export const SIDEBAR_ITEMS = [
     label: "Orders",
     to: ROUTES.ADMIN_ORDERS,
     icon: FiShoppingCart,
+  },
+  {
+    label: "Cancelled Orders",
+    to: ROUTES.ADMIN_CANCELLED_ORDERS,
+    icon: FiXCircle,
   },
   {
     label: "Customers",

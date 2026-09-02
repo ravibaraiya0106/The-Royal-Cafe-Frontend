@@ -1,4 +1,4 @@
-import { useState, useCallback, type ReactNode } from "react";
+import { useEffect, useState, useCallback, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiGrid,
@@ -17,6 +17,8 @@ import { toggleAvailabilityService } from "@/services/deliveryService";
 import { toastSuccess, toastError } from "@/utils/toast";
 import logo from "@/assets/images/logo.png";
 import logo1 from "@/assets/images/logo1.png";
+import { getSocket } from "@/config/socket";
+import { playNotificationChime } from "@/utils/notificationSound";
 
 interface DeliveryLayoutProps {
   children: ReactNode;
@@ -31,6 +33,29 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean>(true);
   const [toggling, setToggling] = useState(false);
+
+  // 🔔 REAL-TIME DELIVERY ASSIGNMENT SOCKET LISTENER
+  useEffect(() => {
+    let socket: ReturnType<typeof getSocket> | null = null;
+    try {
+      socket = getSocket();
+      
+      const handleNewDelivery = (data: { orderNumber?: string; finalAmount?: number }) => {
+        playNotificationChime();
+        const orderInfo = data?.orderNumber ? `#${data.orderNumber}` : "New Order";
+        toastSuccess(`🔔 New Order Assigned: ${orderInfo}!`);
+        window.dispatchEvent(new CustomEvent("orderAssigned", { detail: data }));
+      };
+
+      socket.on("new_delivery_assigned", handleNewDelivery);
+
+      return () => {
+        socket?.off("new_delivery_assigned", handleNewDelivery);
+      };
+    } catch (err) {
+      console.log("Delivery socket connection setup:", err);
+    }
+  }, []);
 
   const handleToggle = useCallback(async () => {
     try {

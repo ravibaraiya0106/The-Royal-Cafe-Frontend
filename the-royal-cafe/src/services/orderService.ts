@@ -1,8 +1,8 @@
-import { getRequest, patchRequest } from "./apiService";
+import { getRequest, patchRequest, postRequest } from "./apiService";
 import { ENDPOINTS } from "@/api/endpoints";
 
-export const ordersList = async () => {
-  const res = await getRequest(ENDPOINTS.ORDER.LIST);
+export const ordersList = async (params?: Record<string, unknown>) => {
+  const res = await getRequest(ENDPOINTS.ORDER.LIST, params);
   const { success, message, responseData } = res.data;
 
   if (!success) throw new Error(message);
@@ -44,5 +44,13 @@ export const updatePaymentStatusService = async (
 
   if (!success) throw new Error(message);
   return responseData;
+};
+
+export const cancelOrderService = async (id: string, reason: string) => {
+  const res = await postRequest(ENDPOINTS.ORDER.CANCEL(id), { reason });
+  const { success, message, responseData } = res.data;
+
+  if (!success) throw new Error(message);
+  return { message, data: responseData };
 };
 

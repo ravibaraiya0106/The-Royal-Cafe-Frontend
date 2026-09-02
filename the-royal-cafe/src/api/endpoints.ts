@@ -76,6 +76,7 @@ export const ENDPOINTS = {
     ADMIN_LIST: "/order/admin/list",
     ADMIN_ANALYTICS: "/order/admin/analytics",
     UPDATE_PAYMENT_STATUS: (id: string) => `/order/update-payment-status/${id}`,
+    CANCEL: (id: string) => `/order/cancel/${id}`,
   },
   PAYMENT: {
     CREATE_ORDER: "/payment/create-order",

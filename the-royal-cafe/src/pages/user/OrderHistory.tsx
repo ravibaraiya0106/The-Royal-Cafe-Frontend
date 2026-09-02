@@ -2,11 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import Navbar from "@/components/layout/Navbar/Navbar";
 import Footer from "@/components/layout/Footer/Footer";
 import { ROUTES } from "@/constants/navigation";
-import { ordersList } from "@/services/orderService";
-import { toastError } from "@/utils/toast";
+import { ordersList, cancelOrderService } from "@/services/orderService";
+import { toastError, toastSuccess } from "@/utils/toast";
 import { Link } from "react-router-dom";
-import { FiTruck, FiMapPin } from "react-icons/fi";
+import { FiTruck, FiMapPin, FiXCircle } from "react-icons/fi";
 import TrackOrderModal, { type OrderTrackInfo } from "@/components/orders/TrackOrderModal";
+import CancelOrderModal from "@/components/orders/CancelOrderModal";
+import Pagination from "@/components/Admin/common/Pagination";
 
 type UserOrder = {
   _id: string;
@@ -26,6 +28,9 @@ type UserOrder = {
   payment_status: "pending" | "paid" | "failed" | string;
   order_status: string;
   createdAt: string;
+  cancellation_reason?: string;
+  cancelled_by?: string;
+  cancelled_at?: string;
   deliveryLocation?: {
     address: string;
     latitude: number;
@@ -44,12 +49,50 @@ const OrderHistory = () => {
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState<UserOrder[]>([]);
   const [selectedTrackOrder, setSelectedTrackOrder] = useState<OrderTrackInfo | null>(null);
+  
+  // Pagination State
+  const [filters, setFilters] = useState({
+    page: 1,
+    limit: 5,
+  });
+  const [pagination, setPagination] = useState({
+    page: 1,
+    totalPages: 1,
+    totalItems: 0,
+  });
 
-  const fetchOrders = async () => {
+  // Cancel Order Modal State
+  const [cancelModalOpen, setCancelModalOpen] = useState(false);
+  const [selectedCancelOrder, setSelectedCancelOrder] = useState<UserOrder | null>(null);
+  const [cancelling, setCancelling] = useState(false);
+
+  const fetchOrders = async (params = filters) => {
     try {
       setLoading(true);
-      const res = await ordersList();
-      setOrders(Array.isArray(res) ? res : []);
+      const res = await ordersList(params);
+      
+      if (res && typeof res === "object" && "data" in res && Array.isArray(res.data)) {
+        setOrders(res.data);
+        const total = typeof res.total === "number" ? res.total : res.data.length;
+        const limit = params.limit || 5;
+        setPagination({
+          page: res.page || params.page || 1,
+          totalPages: res.totalPages || Math.ceil(total / limit) || 1,
+          totalItems: total,
+        });
+      } else if (Array.isArray(res)) {
+        const total = res.length;
+        const limit = params.limit || 5;
+        // If backend returned all orders array, manually slice for current page
+        const start = ((params.page || 1) - 1) * limit;
+        const paginatedOrders = res.slice(start, start + limit);
+        setOrders(paginatedOrders);
+        setPagination({
+          page: params.page || 1,
+          totalPages: Math.ceil(total / limit) || 1,
+          totalItems: total,
+        });
+      }
     } catch (err: unknown) {
       toastError(err instanceof Error ? err.message : "Failed to load orders");
     } finally {
@@ -58,8 +101,15 @@ const OrderHistory = () => {
   };
 
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    fetchOrders(filters);
+  }, [filters]);
+
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({
+      ...prev,
+      page,
+    }));
+  };
 
   const formatDate = useMemo(() => {
     return (iso: string) => {
@@ -93,6 +143,28 @@ const OrderHistory = () => {
     if (s === "pending")
       return "bg-yellow-50 text-yellow-700 border-yellow-200";
     return "bg-gray-50 text-gray-700 border-gray-200";
+  };
+
+  const handleCancelOrder = async (reason: string) => {
+    if (!selectedCancelOrder) return;
+
+    try {
+      setCancelling(true);
+      const res = await cancelOrderService(selectedCancelOrder._id, reason);
+      toastSuccess(res.message || "Order cancelled successfully");
+      setCancelModalOpen(false);
+      setSelectedCancelOrder(null);
+      fetchOrders();
+    } catch (err: unknown) {
+      toastError(err instanceof Error ? err.message : "Failed to cancel order");
+    } finally {
+      setCancelling(false);
+    }
+  };
+
+  const isCancellable = (status: string) => {
+    const s = status.toLowerCase();
+    return s !== "delivered" && s !== "cancelled";
   };
 
   return (
@@ -175,6 +247,21 @@ const OrderHistory = () => {
                         <span>Track Live Order</span>
                       </button>
                     )}
+
+                    {/* Cancel Order Option for Active Orders */}
+                    {isCancellable(o.order_status) && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedCancelOrder(o);
+                          setCancelModalOpen(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-red-300 text-red-700 bg-red-50 hover:bg-red-100 text-xs font-bold rounded-[5px] transition-all shadow-2xs"
+                      >
+                        <FiXCircle className="w-3.5 h-3.5" />
+                        <span>Cancel Order</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -192,6 +279,31 @@ const OrderHistory = () => {
                     </span>
                   </p>
                 </div>
+
+                {/* Cancelled Order Details Banner */}
+                {o.order_status.toLowerCase() === "cancelled" && (
+                  <div className="mt-3 bg-red-50 border border-red-200 rounded-[5px] p-3 text-xs text-red-900 space-y-1">
+                    <p className="font-bold flex items-center gap-1 text-red-800">
+                      <FiXCircle className="w-4 h-4 text-red-600" />
+                      <span>Order Cancelled</span>
+                      {o.cancelled_by && (
+                        <span className="text-[11px] font-normal text-red-700 ml-1">
+                          (by {o.cancelled_by === "admin" ? "Admin" : "You"})
+                        </span>
+                      )}
+                    </p>
+                    {o.cancellation_reason && (
+                      <p className="text-red-800 font-medium">
+                        <strong>Reason:</strong> {o.cancellation_reason}
+                      </p>
+                    )}
+                    {o.cancelled_at && (
+                      <p className="text-gray-500 text-[11px]">
+                        Cancelled on {formatDate(o.cancelled_at)}
+                      </p>
+                    )}
+                  </div>
+                )}
 
                 {o.coupon && (
                   <div className="mt-2.5 text-xs text-gray-600 bg-gray-50 p-2.5 rounded-[5px] border border-gray-100 space-y-0.5">
@@ -217,6 +329,15 @@ const OrderHistory = () => {
                 </div>
               </div>
             ))}
+
+            {/* Pagination Component */}
+            <Pagination
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+              totalItems={pagination.totalItems}
+              limit={filters.limit}
+              onPageChange={handlePageChange}
+            />
           </div>
         )}
       </div>
@@ -228,6 +349,18 @@ const OrderHistory = () => {
           onClose={() => setSelectedTrackOrder(null)}
         />
       )}
+
+      {/* Cancel Order Modal */}
+      <CancelOrderModal
+        open={cancelModalOpen}
+        orderNumber={selectedCancelOrder?.order_number}
+        loading={cancelling}
+        onClose={() => {
+          setCancelModalOpen(false);
+          setSelectedCancelOrder(null);
+        }}
+        onConfirm={handleCancelOrder}
+      />
 
       <Footer />
     </>

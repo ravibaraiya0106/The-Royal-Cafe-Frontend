@@ -72,6 +72,15 @@ const DeliveryDashboard = () => {
 
   useEffect(() => {
     fetchDashboardData();
+
+    const handleNewAssignedEvent = () => {
+      fetchDashboardData();
+    };
+
+    window.addEventListener("orderAssigned", handleNewAssignedEvent);
+    return () => {
+      window.removeEventListener("orderAssigned", handleNewAssignedEvent);
+    };
   }, [fetchDashboardData]);
 
   const handleStatusUpdate = async (id: string, nextStatus: string) => {
