@@ -16,22 +16,39 @@ import { getAvailableCoupons } from "@/services/couponsService";
 import { getToken, getUser } from "@/utils/storage";
 import SelectCouponModal from "@/components/common/modals/SelectCouponModal";
 import MapLocationPicker from "@/components/checkout/MapLocationPicker";
-import UpiPaymentModal from "@/components/checkout/UpiPaymentModal";
+import {
+  createOrder,
+  loadRazorpayScript,
+  verifyPayment,
+  type CreateOrderResponse,
+} from "@/services/paymentService";
 
 type CheckoutForm = {
   phone: string;
   address: string;
   latitude?: number;
   longitude?: number;
-  paymentMethod: "COD" | "UPI";
+  paymentMethod: "COD" | "RAZORPAY";
   notes?: string;
   couponCode?: string;
 };
 
 const paymentOptions = [
   { label: "Cash on Delivery (COD)", value: "COD" },
-  { label: "UPI (Google Pay / PhonePe / Paytm / QR Code / UPI ID)", value: "UPI" },
+  {
+    label: "Online Payment (Razorpay — UPI / Cards / Wallets / Net Banking)",
+    value: "RAZORPAY",
+  },
 ];
+
+const CAFE_NAME = "The Royal Cafe";
+const CAFE_LOGO = "/icon.ico";
+
+type RazorpaySuccessPayload = {
+  razorpay_order_id: string;
+  razorpay_payment_id: string;
+  razorpay_signature: string;
+};
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -45,7 +62,6 @@ const Checkout = () => {
 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [upiModalOpen, setUpiModalOpen] = useState(false);
   const [orderId, setOrderId] = useState<string>("");
   const [finalAmount, setFinalAmount] = useState<number>(0);
   const [couponModalOpen, setCouponModalOpen] = useState(false);
@@ -212,39 +228,46 @@ const Checkout = () => {
     [],
   );
 
+  const syncCartWithBackend = useCallback(async () => {
+    try {
+      await deleteRequest(ENDPOINTS.CART.CLEAR);
+    } catch {
+      // ignore if cart was empty
+    }
+
+    await Promise.all(
+      items.map(async (it) => {
+        const res = await postRequest(ENDPOINTS.CART.CREATE, {
+          product: it.productId,
+          quantity: it.quantity,
+        });
+
+        const { success, message } = res.data as {
+          success: boolean;
+          message: string;
+        };
+
+        if (!success) throw new Error(message || "Failed to add to cart");
+      }),
+    );
+  }, [items]);
+
   const createOrderRequest = useCallback(
-    async (paymentMethod: "COD" | "UPI", upiUtr?: string) => {
-      // 1) Clear stale DB cart items and sync current local cart into backend cart
-      try {
-        await deleteRequest(ENDPOINTS.CART.CLEAR);
-      } catch {
-        // ignore if cart was empty
-      }
+    async (
+      paymentMethod: "COD" | "RAZORPAY",
+      razorpayPayload?: RazorpaySuccessPayload,
+    ) => {
+      await syncCartWithBackend();
 
-      await Promise.all(
-        items.map(async (it) => {
-          const res = await postRequest(ENDPOINTS.CART.CREATE, {
-            product: it.productId,
-            quantity: it.quantity,
-          });
-
-          const { success, message } = res.data as {
-            success: boolean;
-            message: string;
-          };
-
-          if (!success) throw new Error(message || "Failed to add to cart");
-        }),
-      );
-
-      // 2) Create the order in DB
       const orderRes = await postRequest(ENDPOINTS.ORDER.CREATE, {
         address: form.address,
         latitude: form.latitude,
         longitude: form.longitude,
         phone: form.phone,
         payment_method: paymentMethod,
-        upi_utr: upiUtr || "",
+        razorpay_order_id: razorpayPayload?.razorpay_order_id || "",
+        razorpay_payment_id: razorpayPayload?.razorpay_payment_id || "",
+        razorpay_signature: razorpayPayload?.razorpay_signature || "",
         notes: form.notes || "",
         coupon_code: form.couponCode || "",
       });
@@ -283,16 +306,122 @@ const Checkout = () => {
       form.longitude,
       form.notes,
       form.phone,
-      items,
+      syncCartWithBackend,
     ],
   );
+
+  const startRazorpayCheckout = useCallback(async () => {
+    if (!hasPrices) {
+      toastError("Pricing information is missing");
+      return;
+    }
+
+    const amountToPay = totalAfterDiscount;
+    if (amountToPay <= 0) {
+      toastError("Amount must be greater than 0 for online payment");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      await loadRazorpayScript();
+
+      const razorpayOrder: CreateOrderResponse = await createOrder(
+        amountToPay,
+        {
+          order_type: "food_order",
+          phone: form.phone,
+        },
+      );
+
+      const keyId =
+        razorpayOrder.key_id ||
+        import.meta.env.VITE_RAZORPAY_KEY_ID ||
+        "";
+
+      if (!keyId) {
+        throw new Error("Razorpay Key ID is not configured");
+      }
+
+      const currentUser = getUser();
+      const prefill: Record<string, string> = {};
+      if (currentUser?.email) prefill.email = currentUser.email;
+      if (currentUser?.phone || form.phone) {
+        prefill.contact = currentUser?.phone || form.phone;
+      }
+      if (currentUser?.first_name || currentUser?.username) {
+        prefill.name = currentUser.first_name || currentUser.username || "";
+      }
+
+      const options: Record<string, unknown> = {
+        key: keyId,
+        amount: razorpayOrder.amount,
+        currency: razorpayOrder.currency || "INR",
+        name: CAFE_NAME,
+        description: `${CAFE_NAME} Order Payment`,
+        image: CAFE_LOGO,
+        order_id: razorpayOrder.id,
+        handler: async function (response: Record<string, string>) {
+          try {
+            const payload: RazorpaySuccessPayload = {
+              razorpay_order_id: response.razorpay_order_id || "",
+              razorpay_payment_id: response.razorpay_payment_id || "",
+              razorpay_signature: response.razorpay_signature || "",
+            };
+
+            await verifyPayment(payload);
+            await createOrderRequest("RAZORPAY", payload);
+          } catch (err: unknown) {
+            toastError(
+              err instanceof Error
+                ? err.message
+                : "Payment verification failed",
+            );
+          } finally {
+            setLoading(false);
+          }
+        },
+        prefill,
+        notes: {
+          order_id: razorpayOrder.receipt,
+        },
+        theme: {
+          color: "#6A1B1A",
+        },
+        modal: {
+          ondismiss: function () {
+            setLoading(false);
+          },
+        },
+      };
+
+      const rzp = new (window as unknown as {
+        Razorpay: new (opts: Record<string, unknown>) => {
+          open: () => void;
+        };
+      }).Razorpay(options);
+
+      rzp.open();
+    } catch (err: unknown) {
+      setLoading(false);
+      toastError(
+        err instanceof Error ? err.message : "Failed to start Razorpay checkout",
+      );
+    }
+  }, [
+    createOrderRequest,
+    form.phone,
+    hasPrices,
+    totalAfterDiscount,
+  ]);
 
   const placeOrder = useCallback(async () => {
     if (items.length === 0) return;
     if (!validate()) return;
 
-    if (form.paymentMethod === "UPI") {
-      setUpiModalOpen(true);
+    if (form.paymentMethod === "RAZORPAY") {
+      await startRazorpayCheckout();
       return;
     }
 
@@ -304,25 +433,13 @@ const Checkout = () => {
     } finally {
       setLoading(false);
     }
-  }, [createOrderRequest, form.paymentMethod, items.length, validate]);
-
-  const handleConfirmUpiPayment = useCallback(
-    async (utr: string) => {
-      try {
-        setLoading(true);
-        await createOrderRequest("UPI", utr);
-        setUpiModalOpen(false);
-      } catch (err: unknown) {
-        toastError(
-          err instanceof Error ? err.message : "Failed to confirm UPI payment",
-        );
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [createOrderRequest],
-  );
+  }, [
+    createOrderRequest,
+    form.paymentMethod,
+    items.length,
+    startRazorpayCheckout,
+    validate,
+  ]);
 
   if (success) {
     return (
@@ -347,7 +464,9 @@ const Checkout = () => {
             <div className="text-sm text-gray-600">
               Payment Method:{" "}
               <span className="font-semibold text-gray-900">
-                {form.paymentMethod}
+                {form.paymentMethod === "COD"
+                  ? "Cash on Delivery (COD)"
+                  : "Online Payment (Razorpay)"}
               </span>
             </div>
             <div className="text-sm text-gray-600 mt-2">
@@ -414,14 +533,6 @@ const Checkout = () => {
           }));
           toastSuccess(`Coupon applied: ${code}`);
         }}
-      />
-
-      <UpiPaymentModal
-        open={upiModalOpen}
-        onClose={() => setUpiModalOpen(false)}
-        amount={hasPrices ? totalAfterDiscount : subtotal}
-        onSubmitUtr={handleConfirmUpiPayment}
-        loading={loading}
       />
 
       <div className="mt-10 mb-10 px-4 max-w-screen-xl mx-auto">
@@ -514,9 +625,22 @@ const Checkout = () => {
               />
             </div>
 
+            {form.paymentMethod === "RAZORPAY" && (
+              <div className="mt-4 bg-blue-50 border border-blue-200 rounded-[5px] p-3 text-sm text-blue-800">
+                You will be redirected to Razorpay’s secure checkout. Pay via
+                UPI, Debit/Credit Cards, Net Banking, or any digital wallet.
+              </div>
+            )}
+
             <div className="mt-5">
               <PrimaryButton
-                label={loading ? "Placing Order..." : "Place Order"}
+                label={
+                  loading
+                    ? form.paymentMethod === "RAZORPAY"
+                      ? "Redirecting to Razorpay..."
+                      : "Placing Order..."
+                    : "Place Order"
+                }
                 onClick={placeOrder}
                 loading={loading}
                 fullWidth

@@ -29,7 +29,8 @@ type AdminOrder = {
   payment_method: string;
   payment_status: string;
   order_status: string;
-  upi_utr?: string;
+  razorpay_order_id?: string;
+  razorpay_payment_id?: string;
   createdAt: string;
   address: string;
   phone: string;
@@ -257,9 +258,9 @@ const Orders = () => {
               ({row.payment_status})
             </span>
           </span>
-          {row.upi_utr && (
+          {row.razorpay_payment_id && (
             <span className="text-[10px] font-mono text-brand bg-brand/5 px-1.5 py-0.5 rounded border border-brand/20 w-fit">
-              UTR: {row.upi_utr}
+              Razorpay: {row.razorpay_payment_id}
             </span>
           )}
           {row.payment_status !== "paid" && (
@@ -350,7 +351,7 @@ const Orders = () => {
         type: "select" as const,
         options: [
           { label: "COD", value: "COD" },
-          { label: "UPI", value: "UPI" },
+          { label: "Razorpay", value: "RAZORPAY" },
         ],
       },
       {

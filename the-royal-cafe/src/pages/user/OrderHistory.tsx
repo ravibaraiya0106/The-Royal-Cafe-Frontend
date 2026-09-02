@@ -22,7 +22,7 @@ type UserOrder = {
     expiry_date?: string;
   };
   final_amount: number;
-  payment_method: "COD" | "UPI" | "CARD" | string;
+  payment_method: "COD" | "RAZORPAY" | "CARD" | string;
   payment_status: "pending" | "paid" | "failed" | string;
   order_status: string;
   createdAt: string;

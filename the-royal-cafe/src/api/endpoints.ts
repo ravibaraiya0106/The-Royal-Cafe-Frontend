@@ -77,6 +77,10 @@ export const ENDPOINTS = {
     ADMIN_ANALYTICS: "/order/admin/analytics",
     UPDATE_PAYMENT_STATUS: (id: string) => `/order/update-payment-status/${id}`,
   },
+  PAYMENT: {
+    CREATE_ORDER: "/payment/create-order",
+    VERIFY: "/payment/verify",
+  },
   DELIVERY: {
     ASSIGN: "/delivery/assign",
     MY_DELIVERIES: "/delivery/my-deliveries",
