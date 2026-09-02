@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, type ReactNode } from "react";
+import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   FiGrid,
@@ -18,7 +18,7 @@ import { toastSuccess, toastError } from "@/utils/toast";
 import logo from "@/assets/images/logo.png";
 import logo1 from "@/assets/images/logo1.png";
 import { getSocket } from "@/config/socket";
-import { playNotificationChime } from "@/utils/notificationSound";
+import { playNotificationChime, speakVoiceAlert } from "@/utils/notificationSound";
 
 interface DeliveryLayoutProps {
   children: ReactNode;
@@ -33,6 +33,7 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [isAvailable, setIsAvailable] = useState<boolean>(true);
   const [toggling, setToggling] = useState(false);
+  const lastNotifiedOrderRef = useRef<string>("");
 
   // 🔔 REAL-TIME DELIVERY ASSIGNMENT SOCKET LISTENER
   useEffect(() => {
@@ -41,9 +42,20 @@ const DeliveryLayout = ({ children }: DeliveryLayoutProps) => {
       socket = getSocket();
       
       const handleNewDelivery = (data: { orderNumber?: string; finalAmount?: number }) => {
+        const orderKey = data?.orderNumber || JSON.stringify(data);
+        if (lastNotifiedOrderRef.current === orderKey) return; // Deduplicate duplicate socket events
+        lastNotifiedOrderRef.current = orderKey;
+        setTimeout(() => {
+          if (lastNotifiedOrderRef.current === orderKey) {
+            lastNotifiedOrderRef.current = "";
+          }
+        }, 5000);
+
         playNotificationChime();
         const orderInfo = data?.orderNumber ? `#${data.orderNumber}` : "New Order";
         toastSuccess(`🔔 New Order Assigned: ${orderInfo}!`);
+        speakVoiceAlert(`New delivery order assigned! Order ${orderInfo.replace("#", "")}`);
+
         window.dispatchEvent(new CustomEvent("orderAssigned", { detail: data }));
       };
 

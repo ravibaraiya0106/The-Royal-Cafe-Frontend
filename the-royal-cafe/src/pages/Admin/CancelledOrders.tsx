@@ -82,6 +82,15 @@ const CancelledOrders = () => {
 
   useEffect(() => {
     fetchCancelledOrders(filters);
+
+    const handleAdminUpdate = () => {
+      fetchCancelledOrders(filters);
+    };
+
+    window.addEventListener("adminOrderUpdated", handleAdminUpdate);
+    return () => {
+      window.removeEventListener("adminOrderUpdated", handleAdminUpdate);
+    };
   }, [fetchCancelledOrders, filters]);
 
   const handlePageChange = (page: number) => {

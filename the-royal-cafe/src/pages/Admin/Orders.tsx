@@ -129,6 +129,15 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders(filters);
+
+    const handleAdminUpdate = () => {
+      fetchOrders(filters);
+    };
+
+    window.addEventListener("adminOrderUpdated", handleAdminUpdate);
+    return () => {
+      window.removeEventListener("adminOrderUpdated", handleAdminUpdate);
+    };
   }, [fetchOrders, filters]);
 
   const handlePageChange = (page: number) => {
@@ -274,6 +283,8 @@ const Orders = () => {
               className={
                 row.payment_status === "paid"
                   ? "text-emerald-700 font-bold"
+                  : row.payment_status === "refunded" || row.payment_status === "cancelled"
+                  ? "text-red-700 font-bold"
                   : "text-amber-700 font-medium"
               }
             >
@@ -285,7 +296,7 @@ const Orders = () => {
               Razorpay: {row.razorpay_payment_id}
             </span>
           )}
-          {row.payment_status !== "paid" && (
+          {row.payment_status !== "paid" && row.order_status !== "cancelled" && (
             <button
               onClick={() => handleMarkPaid(row._id)}
               className="text-[10px] font-bold text-white bg-emerald-600 hover:bg-emerald-700 px-2 py-0.5 rounded transition shadow-2xs mt-0.5"
